@@ -1,4 +1,7 @@
 import streamlit as st
+
+from tests.errorlog import log_error
+
 # wide layout display
 st.set_page_config(layout="wide")
 
@@ -6,13 +9,13 @@ st.set_page_config(layout="wide")
 
 
 class DashboardClass:
-    def __init__(self, main_df=None):
-        self.main_df = main_df
+    def __init__(self):
+        pass
 
     def title_func(self):
         """
         Creates title display.
-        :return:
+        :return: None
         """
         # create title display
         path = "./assets/"
@@ -21,10 +24,13 @@ class DashboardClass:
         ct.title("RETAIL ANALYTICS DASHBOARD")
         rt.image(path+"retail.png")
 
+        # create a divider
+        st.divider()
+
     def upload_func(self):
         """
         Creates upload and demo selectbox.
-        :return:
+        :return: selection, upload_file
         """
         options = ['Demo Data', 'Upload Data']
         selection = st.sidebar.selectbox(label="SELECT THE DATA", options=options)
@@ -43,17 +49,145 @@ class DashboardClass:
         else:
             return selection, None
 
-    def show_kpi_func(self):
-        col1, col2, col3, col4, col5 = st.columns(5)
+    def sidebar_func(self, validity):
+        """
+        Shows the matched columns.
+        :param validity:
+        :return: None
+        """
+        with st.sidebar.expander("EXPAND TO SEE MATCHED COLUMNS"):
+            st.dataframe(validity)
 
-    def show_graphs_func(self):
-        pass
+    def kpi_date_range_func(self, start_date_default, end_date_default):
+        """
+        Get date ranges from user.
+        :return: start_date, end_date
+        """
+        # kpi title
+        st.markdown("## **KEY PERFORMANCE INDICATOR**")
 
-    def show_inventory_func(self):
-        pass
+        # create the date range input
+        lt, cn, rt = st.columns([1,1,3])
+        date_range = lt.date_input(
+            "SELECT DATE RANGE",
+            value=(start_date_default, end_date_default),
+            min_value=start_date_default,
+            max_value=end_date_default
+        )
+        # unpack the tuple
+        if isinstance(date_range, tuple) and len(date_range) == 2:
+            start_date, end_date = date_range
+        else:
+            rt.warning("Select a start date and an end date.")
+            st.stop()
 
-    def show_ml_func(self):
-        pass
+        return start_date, end_date
+
+    def show_kpi_func(self, total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value):
+        """
+        Shows the kpis on the dashboard
+        :param total_sales:
+        :param gross_profit_margin:
+        :param total_customers:
+        :param customer_frequency:
+        :param average_order_value:
+        :return: None
+        """
+
+
+        col1, col2, col3, col4, col5 = st.columns([2,1,1,1,1])
+        col1.metric("TOTAL SALES", total_sales)
+        col2.metric("GROSS PROFIT MARGIN (%)", gross_profit_margin)
+        col3.metric("TOTAL CUSTOMERS", total_customers)
+        col4.metric("CUSTOMER FREQUENCY", customer_frequency)
+        col5.metric("AVERAGE ORDER VALUE", average_order_value)
+
+        # create an info expander
+        with st.expander("EXPAND FOR INFORMATION ON **KEY PERFORMANCE INDICATORS**"):
+            inf1, inf2, inf3, inf4, inf5 = st.columns([2, 1, 1, 1, 1])
+            inf1.markdown("**TOTAL SALES** – Sum of all sales revenue.")
+            inf2.markdown("**GROSS PROFIT MARGIN (%)** – Percentage of revenue remaining after deducting COGS.")
+            inf3.markdown("**TOTAL CUSTOMERS** – Count of unique customers.")
+            inf4.markdown("**CUSTOMER FREQUENCY** – Average number of orders per customer.")
+            inf5.markdown("**AVERAGE ORDER VALUE** – Average sales revenue per order.")
+
+        # create divider
+        st.divider()
+    def graph_time_granularity_func(self):
+        """
+        Selects time granularity.
+        :return: selection
+        """
+        st.markdown("## **VISUAL INSIGHTS**")
+        selection = st.selectbox(label="SELECT FILTER OPTION", options=['Today', 'This Week', 'This Month', 'This Quarter', 'This Year'])
+        return selection
+
+    def show_graphs_func(self, trend_analysis_graph, top_bestselling_products_graph, profit_margin_by_category_graph):
+        """
+        Graph showing the analysis.
+        :param trend_analysis_graph, top_bestselling_products_graph, profit_margin_by_category_graph
+        :return: None
+        """
+        lt, cn, rt = st.tabs(['TREND ANALYSIS', 'TOP 20 BESTSELLING PRODUCTS', 'PROFIT MARGIN BY CATEGORY'])
+        lt.plotly_chart(trend_analysis_graph, key="trend_analysis")
+        cn.plotly_chart(top_bestselling_products_graph, key="top_products")
+        rt.plotly_chart(profit_margin_by_category_graph, key="profit_margin")
+
+        with st.expander("EXPAND FOR INFORMATION ON **GRAPHS**"):
+            d1, d2, d3 = st.columns(3)
+            d1.markdown("**TREND ANALYSIS** – Displays how total sales changes over time.")
+            d2.markdown("**TOP 20 BESTSELLING PRODUCTS** – Shows the highest-selling products based on sales volume or revenue.")
+            d3.markdown("**PROFIT MARGIN BY CATEGORY** – Compares profit margins across different product categories.")
+
+        # create divider
+        st.divider()
+
+    def show_inventory_func(self, inventory_aging_df):
+        """
+        Shows the top 10 inventory aging table.
+        :param inventory_aging_df:
+        :return: None
+        """
+        st.markdown("## **INVENTORY AGING TABLE**")
+        st.dataframe(inventory_aging_df)
+
+        # description expander
+        with st.expander("EXPAND FOR INFORMATION ON **INVENTORY AGING TABLE**"):
+            st.markdown("**INVENTORY AGING TABLE** – Shows how long products have been in stock, helping identify slow-moving and old inventory.")
+
+        # create divider
+        st.divider()
+
+    def show_ml_model_func(self, sales_forecast_dict):
+        """
+        Shows Sales Forecasting, Customer Segmentation and Customer Lifetime Value.
+        :return: None
+        """
+        # create main heading
+        st.markdown("## **MACHINE LEARNING INSIGHTS**")
+
+        # create multiple tabs
+        ml1, ml2, ml3 = st.tabs(["Sales Forecasting", "Customer Segmentation", "Customer Lifetime Value"])
+
+        # sales forecasting tab
+        ml1.success(f"Next day's ({sales_forecast_dict['Next Day']}) Final Amount Forecast: **{sales_forecast_dict['Next Day Predictions']:.2f}**")
+        ml1.plotly_chart(sales_forecast_dict['Line Chart Figure'])
+        ml1.dataframe(sales_forecast_dict['Sales Forecast Dataframe'])
+        ml1.info(f"Model Reliability Percentage: **{sales_forecast_dict['Reliability Percentage']}%**")
+        ml1.markdown(f"Train R2 Score: **{sales_forecast_dict['Train R2 Score']}** | Test R2 Score: **{sales_forecast_dict['Test R2 Score']}**")
+
+
+        #
+
+        #
+
+        # ml models description
+        with st.expander("EXPAND FOR INFORMATION ON **MACHINE LEARNING INSIGHTS**"):
+            des1, des2, des3 = st.columns(3)
+            st.markdown("**NOTE - Model Reliability Percentage** shows how much you can trust the model’s predictions on both past and new data.")
+            des1.markdown("**Sales Forecasting**: Predicts future sales based on past trends and influencing factors.")
+            des2.markdown("**Customer Segmentation**: Groups customers into clusters based on similar behaviors or attributes.")
+            des3.markdown("**Customer Lifetime Value**: Estimates the total revenue a business can expect from a customer over their lifetime.")
 
     def show_download_func(self):
         pass

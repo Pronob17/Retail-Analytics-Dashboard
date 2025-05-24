@@ -1,0 +1,12 @@
+[2025-05-24 21:28:36] kpi_calculation_func in basicanalytics.py: 'CostPrice'
+[2025-05-24 21:28:36] some_function in basicanalytics.py: 'CustomerID'
+[2025-05-24 21:28:36] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-05-24 21:28:36] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-05-24 21:28:36] top_bestselling_products_graph_func in basicgraph.py: 'ProductName'
+[2025-05-24 21:28:36] profit_margin_by_category_graph_func in basicgraph.py: 'CostPrice'
+[2025-05-24 21:28:36] profit_margin_by_category_graph_func in basicgraph.py: 'ProductID'
+[2025-05-24 21:28:36] ml_sales_forecasting_func in machinelearningoperations.py: Input y contains NaN.
+[2025-05-25 00:38:25] ml_sales_forecasting_func in machinelearningoperations.py: 'Date'
+[2025-05-25 00:39:35] ml_sales_forecasting_func in machinelearningoperations.py: 'Date'
+[2025-05-25 00:40:41] ml_sales_forecasting_func in machinelearningoperations.py: 'Date'
+[2025-05-25 00:41:59] ml_sales_forecasting_func in machinelearningoperations.py: 'Date'
