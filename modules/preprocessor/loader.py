@@ -46,11 +46,12 @@ class LoaderClass:
 
         return main_df
 
-    def standardize_func(self, df, data_path):
+    def standardize_func(self, df):
         """
         Standardizes the columns.
         :return: df
         """
+        data_path = "./data/"
         json_path = 'columns_dictionary_full.json'
         json_file = data_path + json_path
 
@@ -69,6 +70,7 @@ class LoaderClass:
 
         for std_col in self.standard_columns:
             alternatives = self.alternative_names.get(std_col, [])
+
             # Prepare lowercase list of alternatives + standard name itself
             alternatives_lower = [alt.lower() for alt in alternatives] + [std_col.lower()]
 

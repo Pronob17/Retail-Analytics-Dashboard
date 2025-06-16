@@ -20,9 +20,9 @@ class DashboardClass:
         # create title display
         path = "./assets/"
         lt, ct, rt = st.columns([1,3,1])
-        lt.image(path+"business_image.png")
+        lt.image(path+"retail.png")
         ct.title("RETAIL ANALYTICS DASHBOARD")
-        rt.image(path+"retail.png")
+        rt.image(path+"analytics.png")
 
         # create a divider
         st.divider()
@@ -34,8 +34,9 @@ class DashboardClass:
         """
         options = ['Demo Data', 'Upload Data']
         selection = st.sidebar.selectbox(label="SELECT THE DATA", options=options)
+
         # if selection is upload data
-        if selection=='Upload Data':
+        if selection == 'Upload Data':
             upload_file = st.sidebar.file_uploader("Select file")
             # check if uploaded file exist
             if upload_file:
@@ -158,7 +159,7 @@ class DashboardClass:
         # create divider
         st.divider()
 
-    def show_ml_model_func(self, sales_forecast_dict):
+    def show_ml_model_func(self, sales_forecast_dict, customer_segmentation_dict, customer_lifetime_value_dict):
         """
         Shows Sales Forecasting, Customer Segmentation and Customer Lifetime Value.
         :return: None
@@ -172,14 +173,27 @@ class DashboardClass:
         # sales forecasting tab
         ml1.success(f"Next day's ({sales_forecast_dict['Next Day']}) Final Amount Forecast: **{sales_forecast_dict['Next Day Predictions']:.2f}**")
         ml1.plotly_chart(sales_forecast_dict['Line Chart Figure'])
-        ml1.dataframe(sales_forecast_dict['Sales Forecast Dataframe'])
         ml1.info(f"Model Reliability Percentage: **{sales_forecast_dict['Reliability Percentage']}%**")
-        ml1.markdown(f"Train R2 Score: **{sales_forecast_dict['Train R2 Score']}** | Test R2 Score: **{sales_forecast_dict['Test R2 Score']}**")
+
+        # additional verification details
+        with ml1.expander("Technical Details of Model's Reliability"):
+            st.dataframe(sales_forecast_dict['Sales Forecast Dataframe'])
+            st.markdown(f"Train R2 Score: **{sales_forecast_dict['Train R2 Score']}** | Test R2 Score: **{sales_forecast_dict['Test R2 Score']}**")
 
 
-        #
+        #  customer segmentation tab
+        ml2.success(f"Total number of clusters: {customer_segmentation_dict['Best K']}")
+        ml2.dataframe(customer_segmentation_dict['Cluster Summary'])
+        ml2.info(f"Model Reliability Percentage: **{customer_segmentation_dict['Reliability Percentage']}**")
 
-        #
+        with ml2.expander("Technical Details of Model's Reliability"):
+            st.plotly_chart(customer_segmentation_dict['Elbow Plot Figure'])
+            st.plotly_chart(customer_segmentation_dict['Scatter Plot Figure'])
+            st.dataframe(customer_segmentation_dict['Segmented RFM Dataframe'])
+
+
+
+        # customer lifetime value tab
 
         # ml models description
         with st.expander("EXPAND FOR INFORMATION ON **MACHINE LEARNING INSIGHTS**"):

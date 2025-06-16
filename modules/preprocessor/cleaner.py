@@ -18,6 +18,7 @@ class CleanerClass:
         :param main_df:
         :return: cleaned_date_df
         """
+        # create a copy of the original dataframe
         cleaned_date_main_df = main_df.copy()
 
         # take each column
@@ -54,7 +55,9 @@ class CleanerClass:
         :param cleaned_date_main_df:
         :return: imputed cleaned_date_main_df
         """
+        # create the copy of the dataframe that have cleaned datetime columns
         cleaned_df = cleaned_date_main_df.copy()
+
         # get id column
         id_col = [col for col in cleaned_df.columns if "ID" in col]
 
@@ -69,6 +72,7 @@ class CleanerClass:
 
         # get numeric column that have small unique values so will be converted to categorical
         numeric_but_cat = [col for col in num_col if cleaned_df[col].nunique() < 10]
+        
         # extend the list
         for col in numeric_but_cat:
             cleaned_df[col] = cleaned_df[col].astype('object')

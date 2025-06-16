@@ -46,7 +46,7 @@ class BasicAnalyticsClass:
         # 'FinalAmount', 'CostPrice', 'Quantity'
         try:
             gross_profit = filtered_df['FinalAmount'].sum() - (
-                        filtered_df['Quantity'] * filtered_df['CostPrice']).sum()
+                    filtered_df['Quantity'] * filtered_df['CostPrice']).sum()
             gross_profit_margin = round(gross_profit / filtered_df['FinalAmount'].sum() * 100, 2)
         except Exception as e:
             print(e)

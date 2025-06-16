@@ -182,28 +182,22 @@ class BasicGraphsClass:
         """
         try:
             inventory_df = basic_analytics_df.copy()
-            if "ProductID" not in inventory_df.columns or "Date" not in inventory_df.columns:
-                print("Missing 'ProductID' or 'Date' column for inventory aging.")
+            if "ProductName" not in inventory_df.columns or "Date" not in inventory_df.columns:
+                print("Missing 'ProductName' or 'Date' column for inventory aging.")
 
-            # Step 1: Get latest transaction date per ProductID
-            last_transaction = inventory_df.groupby('ProductID')['Date'].max().reset_index()
-            last_transaction.columns = ['ProductID', 'LastTransactionDate']
+            # Step 1: Get latest transaction date per ProductName
+            last_transaction = inventory_df.groupby('ProductName')['Date'].max().reset_index()
+            last_transaction.columns = ['ProductName', 'LastTransactionDate']
 
             # Step 2: Calculate inventory age
             last_transaction['InventoryAge (days)'] = (self.today - last_transaction['LastTransactionDate']).dt.days
 
-            # Step 3: Get product names (unique)
-            product_names = inventory_df[['ProductID', 'ProductName']].drop_duplicates()
-
-            # Step 4: Merge to bring in ProductName
-            last_transaction = pd.merge(last_transaction, product_names, on='ProductID', how='left')
-
-            # Step 5: Sort by age
+            # Step 3: Sort by age
             last_transaction = last_transaction.sort_values(by='InventoryAge (days)', ascending=False)
-            inventory_aging_df = last_transaction[['ProductID', 'ProductName', 'LastTransactionDate', 'InventoryAge (days)']]
+            inventory_aging_df = last_transaction[['ProductName', 'LastTransactionDate', 'InventoryAge (days)']]
         except Exception as e:
             print(e)
             log_error(str(e), source="profit_margin_by_category_graph_func in basicgraph.py")
-            inventory_aging_df = pd.DataFrame(columns=['ProductID', 'ProductName', 'LastTransactionDate', 'InventoryAge (days)'])
+            inventory_aging_df = pd.DataFrame(columns=['ProductName', 'LastTransactionDate', 'InventoryAge (days)'])
 
         return inventory_aging_df
