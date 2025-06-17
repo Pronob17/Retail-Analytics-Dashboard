@@ -11,7 +11,7 @@ class BasicGraphsClass:
         self.selection = selection
         self.data = None
         # get today's time
-        self.today = pd.Timestamp.today()
+        self.today = pd.Timestamp.now().normalize()
 
         # Optional placeholder empty figure
         self.empty_fig = go.Figure()
@@ -27,6 +27,9 @@ class BasicGraphsClass:
                 "font": {"size": 20}
             }]
         )
+
+        print(basic_analytics_df["Date"].head())
+        print("Number of NaT after parsing:", basic_analytics_df["Date"].isna().sum())
 
         # condition to check for Date column
         if "Date" not in basic_analytics_df.columns:
@@ -175,6 +178,7 @@ class BasicGraphsClass:
             )
 
             grouped = grouped.sort_values("Profit_Margin (%)", ascending=False)
+            print(grouped)
 
             title = f"{getattr(self, 'selection', 'Business')}'s Profit Margin By Category"
 
@@ -190,6 +194,8 @@ class BasicGraphsClass:
             print(e)
             log_error(str(e), source="profit_margin_by_category_graph_func in basicgraph.py")
             fig = self.empty_fig
+
+
 
         return fig
 

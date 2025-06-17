@@ -214,5 +214,7 @@ class DashboardClass:
             des2.markdown("**Customer Segmentation**: Groups customers into clusters based on similar behaviors or attributes.")
             des3.markdown("**Customer Lifetime Value**: Estimates the total revenue a business can expect from a customer over their lifetime.")
 
+        st.divider()
+
     def show_download_func(self):
         pass

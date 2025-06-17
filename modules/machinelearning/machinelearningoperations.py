@@ -320,8 +320,6 @@ class MachineLearningClass:
         results_df = pd.DataFrame()
 
         try:
-            print(self.ml_df.head())
-            print(self.ml_df.shape)
             ml_cust_lifetime_df = self.ml_df.copy()
             ml_cust_lifetime_df['Date'] = pd.to_datetime(ml_cust_lifetime_df['Date'])
 

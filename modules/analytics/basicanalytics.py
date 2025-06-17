@@ -31,7 +31,7 @@ class BasicAnalyticsClass:
         try:
             if 'FinalAmount' in filtered_df.columns:
                 total_sales = round(filtered_df['FinalAmount'].sum(), 2)
-                print(f"Total Sales: {total_sales}")
+
             elif 'SellingPrice' in filtered_df.columns and 'Discount' in filtered_df.columns:
                 # Calculate total sales based on SellingPrice and Discount
                 total_sales = round((filtered_df['Quantity'] * filtered_df['SellingPrice']) - (

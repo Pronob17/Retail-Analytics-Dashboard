@@ -105,6 +105,6 @@ def main():
 
     # Finally send the data to dashboard
     dashboard.show_ml_model_func(sales_forecast_dict, customer_segmentation_dict, customer_lifetime_value_dict)
-
+    
 if __name__ == "__main__":
     main()
