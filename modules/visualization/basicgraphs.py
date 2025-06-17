@@ -168,7 +168,12 @@ class BasicGraphsClass:
                 print("Grouped data is empty.")
                 return self.empty_fig
 
-            grouped["Profit_Margin (%)"] = round((grouped["Total_Profit"] / grouped["Total_Revenue"]) * 100, 2)
+            grouped["Profit_Margin (%)"] = grouped.apply(
+                lambda row: round((row["Total_Profit"] / row["Total_Revenue"]) * 100, 2)
+                if row["Total_Revenue"] != 0 else 0,
+                axis=1
+            )
+
             grouped = grouped.sort_values("Profit_Margin (%)", ascending=False)
 
             title = f"{getattr(self, 'selection', 'Business')}'s Profit Margin By Category"
