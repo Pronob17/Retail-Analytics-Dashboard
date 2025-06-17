@@ -200,7 +200,7 @@ class DashboardClass:
 
 
         with ml3.expander("Technical Details of Model's Reliability"):
-            ml3.plotly_chart(customer_lifetime_value_dict['fig_hist'])
+            st.plotly_chart(customer_lifetime_value_dict['fig_hist'])
             st.markdown(
                 f"Train R2 Score: **{customer_lifetime_value_dict['r2_train']}** | Test R2 Score: **{customer_lifetime_value_dict['r2_test']}**")
             st.markdown(f"Mean Absolute Error: **{customer_lifetime_value_dict['mae']}**")
