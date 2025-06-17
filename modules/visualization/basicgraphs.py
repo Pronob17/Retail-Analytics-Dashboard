@@ -134,7 +134,6 @@ class BasicGraphsClass:
         :return: fig
         """
         try:
-            # profit margin by category
             category_col = "Category"
             revenue_col = "FinalAmount"
             cost_price_col = "CostPrice"
@@ -144,28 +143,42 @@ class BasicGraphsClass:
             missing = [col for col in required_cols if col not in self.data.columns]
             if missing:
                 print(f"Missing columns for profit margin chart: {', '.join(missing)}")
+                return self.empty_fig
 
-            self.data.loc[:, "Cost"] = self.data[cost_price_col] * self.data[quantity_col]
+            self.data["Cost"] = self.data[cost_price_col] * self.data[quantity_col]
+
             if "FinalAmount" in self.data.columns:
-                self.data.loc[:, "Profit"] = self.data[revenue_col] - self.data[cost_price_col] * self.data[
-                    quantity_col]
-            elif ("SellingPrice" in self.data.columns) and ("Quantity" in self.data.columns):
-                self.data.loc[:, "Profit"] = (self.data["SellingPrice"] * self.data["Quantity"]) - self.data["Cost"]
+                self.data["Profit"] = self.data[revenue_col] - self.data["Cost"]
+            elif "SellingPrice" in self.data.columns and "Quantity" in self.data.columns:
+                self.data["Profit"] = (self.data["SellingPrice"] * self.data["Quantity"]) - self.data["Cost"]
+            else:
+                print("No valid price columns to calculate profit.")
+                return self.empty_fig
+
+            if self.data.empty:
+                print("Data is empty.")
+                return self.empty_fig
 
             grouped = self.data.groupby(category_col).agg(
                 Total_Profit=("Profit", "sum"),
                 Total_Revenue=(revenue_col, "sum")
             ).reset_index()
 
+            if grouped.empty:
+                print("Grouped data is empty.")
+                return self.empty_fig
+
             grouped["Profit_Margin (%)"] = round((grouped["Total_Profit"] / grouped["Total_Revenue"]) * 100, 2)
             grouped = grouped.sort_values("Profit_Margin (%)", ascending=False)
+
+            title = f"{getattr(self, 'selection', 'Business')}'s Profit Margin By Category"
 
             fig = px.bar(
                 grouped,
                 x=category_col,
                 y="Profit_Margin (%)",
                 color="Profit_Margin (%)",
-                title=f"{self.selection}'s Profit Margin By Category",
+                title=title,
                 color_continuous_scale="Viridis"
             )
         except Exception as e:
