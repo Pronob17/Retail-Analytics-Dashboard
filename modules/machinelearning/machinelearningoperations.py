@@ -7,6 +7,8 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from kneed import KneeLocator
 from sklearn.metrics import davies_bouldin_score
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -46,8 +48,6 @@ class MachineLearningClass:
         Calculates the sales forecasting for test data and most importantly, the next day's Final Amount.
         :return: sales_forecast_dict,
         """
-
-
         ml_linear_regression_df = self.ml_df.copy()
 
         # only take the numerical column
@@ -169,15 +169,6 @@ class MachineLearningClass:
         :param plot: Whether to generate elbow plot in Plotly
         :return: Dictionary of results
         """
-        import pandas as pd
-        from sklearn.pipeline import Pipeline
-        from sklearn.preprocessing import StandardScaler
-        from sklearn.cluster import KMeans
-        from sklearn.decomposition import PCA
-        from kneed import KneeLocator
-        import plotly.graph_objects as go
-        import plotly.express as px
-
         best_k = 0
         fig_cluster = None
         fig_elbow = None
@@ -304,8 +295,6 @@ class MachineLearningClass:
             fig_cluster = go.Figure()
             fig_cluster.update_layout(title="Error: Cluster plot not available")
 
-
-
         customer_segment_dict = {
             'Best K': best_k,
             'Segmented RFM Dataframe': rfm,
@@ -317,11 +306,142 @@ class MachineLearningClass:
 
         return customer_segment_dict
 
-
     def ml_customer_lifetime_value_func(self):
         """
-
-        :return:
+        Predicts Customer Lifetime Value (CLV) using RFM features and Ridge Regression.
+        Returns prediction results, performance metrics, histogram plot, and reliability score.
+        :return: customer_lifetime_value_dict
         """
-        pass
+
+        # Initialize outputs
+        r2_train = r2_test = mse = mae = reliability_pct = 0
+        reliability_score_combined = "N/A"
+        fig_hist = go.Figure()
+        results_df = pd.DataFrame()
+
+        try:
+            print(self.ml_df.head())
+            print(self.ml_df.shape)
+            ml_cust_lifetime_df = self.ml_df.copy()
+            ml_cust_lifetime_df['Date'] = pd.to_datetime(ml_cust_lifetime_df['Date'])
+
+            if 'FinalAmount' not in ml_cust_lifetime_df.columns:
+                ml_cust_lifetime_df['FinalAmount'] = (
+                        ml_cust_lifetime_df['Quantity'] * ml_cust_lifetime_df['UnitPrice']
+                )
+
+            snapshot_date = ml_cust_lifetime_df['Date'].max() + pd.Timedelta(days=1)
+
+            rfm = ml_cust_lifetime_df.groupby('CustomerID').agg({
+                'Date': [
+                    lambda x: (snapshot_date - x.max()).days,
+                    lambda x: (x.max() - x.min()).days
+                ],
+                'TransactionID': 'nunique',
+                'FinalAmount': 'sum',
+                'Quantity': 'mean',
+                'DiscountPercent': 'mean'
+            })
+
+            rfm.columns = ['Recency', 'CustomerAge', 'Frequency', 'Monetary', 'AvgQuantity', 'AvgDiscount']
+            rfm.reset_index(inplace=True)
+            rfm.fillna(0, inplace=True)
+
+            X = rfm[['Recency', 'CustomerAge', 'Frequency', 'AvgQuantity', 'AvgDiscount']]
+            y = rfm['Monetary'].values.reshape(-1, 1)
+
+            scaler_y = StandardScaler()
+            y_scaled = scaler_y.fit_transform(y)
+
+            X_train, X_test, y_train, y_test, cust_train, cust_test = train_test_split(
+                X, y_scaled, rfm['CustomerID'], test_size=0.2, random_state=42
+            )
+
+            model = Ridge(alpha=1.0)
+            model.fit(X_train, y_train)
+
+            y_train_pred = model.predict(X_train)
+            y_test_pred = model.predict(X_test)
+
+            # ✅ FIXED inverse_transform for 1D predictions
+            y_train_orig = scaler_y.inverse_transform(y_train).flatten()
+            y_train_pred_orig = scaler_y.inverse_transform(y_train_pred.reshape(-1, 1)).flatten()
+            y_test_orig = scaler_y.inverse_transform(y_test).flatten()
+            y_test_pred_orig = scaler_y.inverse_transform(y_test_pred.reshape(-1, 1)).flatten()
+
+            r2_train = r2_score(y_train_orig, y_train_pred_orig)
+            r2_test = r2_score(y_test_orig, y_test_pred_orig)
+            mse = mean_squared_error(y_test_orig, y_test_pred_orig)
+            mae = mean_absolute_error(y_test_orig, y_test_pred_orig)
+
+            reliability_pct = max(0.0, round(r2_test * 100, 2))
+            if reliability_pct >= 80:
+                label = "Excellent"
+            elif reliability_pct >= 60:
+                label = "Good"
+            elif reliability_pct >= 40:
+                label = "Moderate"
+            elif reliability_pct >= 20:
+                label = "Weak"
+            else:
+                label = "Poor"
+            reliability_score_combined = f"{reliability_pct}% ({label} reliability)"
+
+            results_df = pd.DataFrame({
+                'CustomerID': cust_test.values,
+                'Predicted_CLV': y_test_pred_orig,
+                'Actual_CLV': y_test_orig,
+                'Difference': y_test_orig - y_test_pred_orig
+            }).sort_values('Predicted_CLV', ascending=False).reset_index(drop=True)
+
+            fig_hist = go.Figure()
+            fig_hist.add_trace(go.Histogram(
+                x=results_df['Actual_CLV'],
+                name='Actual CLV',
+                opacity=0.6,
+                marker_color='blue'
+            ))
+            fig_hist.add_trace(go.Histogram(
+                x=results_df['Predicted_CLV'],
+                name='Predicted CLV',
+                opacity=0.6,
+                marker_color='orange'
+            ))
+            fig_hist.update_layout(
+                title='Distribution of Actual vs Predicted CLV',
+                xaxis_title='Customer Lifetime Value',
+                yaxis_title='Count',
+                barmode='overlay',
+                legend_title='Type'
+            )
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            log_error(str(e), source="ml_customer_lifetime_value_func")
+
+            r2_train = 0
+            r2_test = 0
+            mse = 0
+            mae = 0
+            reliability_score_combined = "N/A"
+            fig_hist = go.Figure()
+            results_df = pd.DataFrame()
+
+        customer_lifetime_value_dict = {
+            'r2_train': round(r2_train, 4),
+            'r2_test': round(r2_test, 4),
+            'mse': round(mse, 2),
+            'mae': round(mae, 2),
+            'Reliability': reliability_score_combined,
+            'fig_hist': fig_hist,
+            'Sample Results': results_df.head(10).sort_values(by='Predicted_CLV', ascending=False)
+        }
+
+        return customer_lifetime_value_dict
+
+
+
+
+
 

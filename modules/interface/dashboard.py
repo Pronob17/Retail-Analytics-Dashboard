@@ -1,10 +1,11 @@
 import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
 
 from tests.errorlog import log_error
 
 # wide layout display
 st.set_page_config(layout="wide")
-
 
 
 
@@ -180,9 +181,8 @@ class DashboardClass:
             st.dataframe(sales_forecast_dict['Sales Forecast Dataframe'])
             st.markdown(f"Train R2 Score: **{sales_forecast_dict['Train R2 Score']}** | Test R2 Score: **{sales_forecast_dict['Test R2 Score']}**")
 
-
         #  customer segmentation tab
-        ml2.success(f"Total number of clusters: {customer_segmentation_dict['Best K']}")
+        ml2.success(f"Total number of clusters: **{customer_segmentation_dict['Best K']}**")
         ml2.dataframe(customer_segmentation_dict['Cluster Summary'])
         ml2.info(f"Model Reliability Percentage: **{customer_segmentation_dict['Reliability Percentage']}**")
 
@@ -191,9 +191,18 @@ class DashboardClass:
             st.plotly_chart(customer_segmentation_dict['Scatter Plot Figure'])
             st.dataframe(customer_segmentation_dict['Segmented RFM Dataframe'])
 
-
-
         # customer lifetime value tab
+        ml3.success("Top 10 Customers based on Predicted Lifetime values:")
+        ml3.dataframe(customer_lifetime_value_dict['Sample Results'])
+        ml3.plotly_chart(customer_lifetime_value_dict['fig_hist'])
+        ml3.info(f"Model Reliability: **{customer_lifetime_value_dict['Reliability']}**")
+
+
+        with ml3.expander("Technical Details of Model's Reliability"):
+            st.markdown(
+                f"Train R2 Score: **{customer_lifetime_value_dict['r2_train']}** | Test R2 Score: **{customer_lifetime_value_dict['r2_test']}**")
+            st.markdown(f"Mean Absolute Error: **{customer_lifetime_value_dict['mae']}**")
+            st.markdown(f"Mean Squared Error: **{customer_lifetime_value_dict['mse']}**")
 
         # ml models description
         with st.expander("EXPAND FOR INFORMATION ON **MACHINE LEARNING INSIGHTS**"):

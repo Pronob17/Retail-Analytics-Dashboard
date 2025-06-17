@@ -1,8 +1,9 @@
 from datetime import date
+import streamlit as st
 
 from modules.analytics.basicanalytics import BasicAnalyticsClass
 from modules.interface.dashboard import DashboardClass
-from modules.machinelearning.machinelearningoperations import MachineLearningClass
+# from modules.machinelearning.machinelearningoperations import MachineLearningClass
 from modules.machinelearning.machinelearningoperations import cache_func
 from modules.preprocessor.cleaner import CleanerClass
 from modules.preprocessor.loader import LoaderClass
@@ -99,8 +100,8 @@ def main():
     # MACHINE LEARNING
 
     # call cache function to get the ml dictionaries
-    sales_forecast_dict, customer_segmentation_dict, customer_lifetime_value_dict = cache_func(cleaned_date_main_df)
-
+    with st.spinner("Running Machine Learning Operations..."):
+        sales_forecast_dict, customer_segmentation_dict, customer_lifetime_value_dict = cache_func(cleaned_date_main_df)
 
     # Finally send the data to dashboard
     dashboard.show_ml_model_func(sales_forecast_dict, customer_segmentation_dict, customer_lifetime_value_dict)
