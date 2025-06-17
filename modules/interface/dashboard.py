@@ -1,11 +1,13 @@
 import streamlit as st
+# wide layout display
+st.set_page_config(layout="wide")
+
 import pandas as pd
 import plotly.graph_objects as go
 
 from tests.errorlog import log_error
 
-# wide layout display
-st.set_page_config(layout="wide")
+
 
 
 
