@@ -3,12 +3,11 @@ import streamlit as st
 
 from modules.analytics.basicanalytics import BasicAnalyticsClass
 from modules.interface.dashboard import DashboardClass
-# from modules.machinelearning.machinelearningoperations import MachineLearningClass
 from modules.machinelearning.machinelearningoperations import cache_func
 from modules.preprocessor.cleaner import CleanerClass
 from modules.preprocessor.loader import LoaderClass
 from modules.visualization.basicgraphs import BasicGraphsClass
-
+from modules.interface.pdf import pdf_generator_func
 
 
 def main():
@@ -49,6 +48,7 @@ def main():
     # impute the dataframe
     basic_analytics_df = clean.imputer_func(cleaned_date_main_df)
 
+
     # KEY PERFORMANCE INDICATORS
 
     # initialize the date range
@@ -76,6 +76,7 @@ def main():
         avg_days_between_purchases
     )
 
+
     # GRAPHS
 
     # get the time granularity
@@ -92,11 +93,13 @@ def main():
     # send all the graphs to the dashboard
     dashboard.show_graphs_func(trend_analysis_graph, top_bestselling_products_graph, profit_margin_by_category_graph)
 
+
     # INVENTORY AGING TABLE
     # get the inventory_aging_df table
     inventory_aging_df = graph.inventory_aging_table_func(basic_analytics_df)
     # send to the dashboard
     dashboard.show_inventory_func(inventory_aging_df)
+
 
     # MACHINE LEARNING
 
@@ -106,6 +109,43 @@ def main():
 
     # Finally send the data to dashboard
     dashboard.show_ml_model_func(sales_forecast_dict, customer_segmentation_dict, customer_lifetime_value_dict)
-    
+
+
+    # --- PDF GENERATOR SETUP ---
+
+    # 1. KPIs: convert to list of tuples with labels
+    kpi_tuple = [
+        ("Total Sales", total_sales),
+        ("Gross Profit Margin", gross_profit_margin),
+        ("Total Customers", total_customers),
+        ("Customer Frequency", customer_frequency),
+        ("Average Order Value", average_order_value),
+        ("Avg Days Between Purchases", avg_days_between_purchases)
+    ]
+
+    # 2. Graphs: make sure they are in a list or tuple
+    graph_tuple = (
+        trend_analysis_graph,
+        top_bestselling_products_graph,
+        profit_margin_by_category_graph
+    )
+
+    # 3. Inventory DataFrame
+    inv_tuple = inventory_aging_df  # it's already a DataFrame
+
+    # 4. ML Results: Combine all ML model dictionaries into a single one (optional: keep them separate)
+    ml_tuple = {
+        "Sales Forecasting": sales_forecast_dict,
+        "Customer Segmentation": customer_segmentation_dict,
+        "Customer Lifetime Value": customer_lifetime_value_dict
+    }
+
+    # 5. Generate PDF Summary
+    summary_result = pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple)
+
+    # 6. Download Trigger via Dashboard
+    dashboard.pdf_download_func(summary_result)
+
+
 if __name__ == "__main__":
     main()

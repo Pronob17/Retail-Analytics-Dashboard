@@ -229,5 +229,18 @@ class DashboardClass:
 
         st.divider()
 
-    def show_download_func(self):
-        pass
+    def pdf_download_func(self, summary_result):
+        """
+        This dashboard function gets the summary result from the main module and when the download button is clicked, it sends the summary_result.
+        :param summary_result:
+        :return: None
+        """
+        # create a divider
+        st.sidebar.divider()
+        # create a button
+        st.sidebar.download_button(
+            label="📄 DOWNLOAD SUMMARY RESULT",
+            data=summary_result,
+            file_name="Retail_Summary_Result.pdf",
+            mime="application/pdf"
+        )
