@@ -361,7 +361,6 @@ class MachineLearningClass:
             y_train_pred = model.predict(X_train)
             y_test_pred = model.predict(X_test)
 
-            # ✅ FIXED inverse_transform for 1D predictions
             y_train_orig = scaler_y.inverse_transform(y_train).flatten()
             y_train_pred_orig = scaler_y.inverse_transform(y_train_pred.reshape(-1, 1)).flatten()
             y_test_orig = scaler_y.inverse_transform(y_test).flatten()
@@ -417,11 +416,7 @@ class MachineLearningClass:
             import traceback
             traceback.print_exc()
             log_error(str(e), source="ml_customer_lifetime_value_func")
-
-            r2_train = 0
-            r2_test = 0
-            mse = 0
-            mae = 0
+            r2_train = r2_test = mse = mae = 0
             reliability_score_combined = "N/A"
             fig_hist = go.Figure()
             results_df = pd.DataFrame()
@@ -433,10 +428,15 @@ class MachineLearningClass:
             'mae': round(mae, 2),
             'Reliability': reliability_score_combined,
             'fig_hist': fig_hist,
-            'Sample Results': results_df.head(10).sort_values(by='Predicted_CLV', ascending=False)
+            'Sample Results': (
+                results_df.head(10).sort_values(by='Predicted_CLV', ascending=False)
+                if 'Predicted_CLV' in results_df.columns else
+                pd.DataFrame({"Error": ["Predicted_CLV not found in results_df"]})
+            )
         }
 
         return customer_lifetime_value_dict
+
 
 
 

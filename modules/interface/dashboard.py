@@ -180,46 +180,52 @@ class DashboardClass:
         # create multiple tabs
         ml1, ml2, ml3 = st.tabs(["Sales Forecasting", "Customer Segmentation", "Customer Lifetime Value"])
 
-        # sales forecasting tab
-        ml1.success(f"Next day's ({sales_forecast_dict['Next Day']}) Final Amount Forecast: **{sales_forecast_dict['Next Day Predictions']:.2f}**")
-        ml1.plotly_chart(sales_forecast_dict['Line Chart Figure'])
+        # ----- SALES FORECASTING TAB -----
+        ml1.success(
+            f"Next day's ({sales_forecast_dict['Next Day']}) Final Amount Forecast: **{sales_forecast_dict['Next Day Predictions']:.2f}**")
+        ml1.plotly_chart(sales_forecast_dict['Line Chart Figure'], use_container_width=True, key="sales_forecast_chart")
         ml1.info(f"Model Reliability Percentage: **{sales_forecast_dict['Reliability Percentage']}%**")
 
         # additional verification details
         with ml1.expander("Technical Details of Model's Reliability"):
             st.dataframe(sales_forecast_dict['Sales Forecast Dataframe'])
-            st.markdown(f"Train R2 Score: **{sales_forecast_dict['Train R2 Score']}** | Test R2 Score: **{sales_forecast_dict['Test R2 Score']}**")
+            st.markdown(
+                f"Train R2 Score: **{sales_forecast_dict['Train R2 Score']}** | Test R2 Score: **{sales_forecast_dict['Test R2 Score']}**")
 
-        #  customer segmentation tab
+        # ----- CUSTOMER SEGMENTATION TAB -----
         ml2.success(f"Total number of clusters: **{customer_segmentation_dict['Best K']}**")
         ml2.dataframe(customer_segmentation_dict['Cluster Summary'])
         ml2.info(f"Model Reliability Percentage: **{customer_segmentation_dict['Reliability Percentage']}**")
 
         with ml2.expander("Technical Details of Model's Reliability"):
-            st.plotly_chart(customer_segmentation_dict['Elbow Plot Figure'])
-            st.plotly_chart(customer_segmentation_dict['Scatter Plot Figure'])
+            st.plotly_chart(customer_segmentation_dict['Elbow Plot Figure'], use_container_width=True,
+                            key="elbow_plot_chart")
+            st.plotly_chart(customer_segmentation_dict['Scatter Plot Figure'], use_container_width=True,
+                            key="scatter_plot_chart")
             st.dataframe(customer_segmentation_dict['Segmented RFM Dataframe'])
 
-        # customer lifetime value tab
+        # ----- CUSTOMER LIFETIME VALUE TAB -----
         ml3.success("Top 10 Customers based on Predicted Lifetime values:")
         ml3.dataframe(customer_lifetime_value_dict['Sample Results'])
         ml3.info(f"Model Reliability: **{customer_lifetime_value_dict['Reliability']}**")
 
-
         with ml3.expander("Technical Details of Model's Reliability"):
-            st.plotly_chart(customer_lifetime_value_dict['fig_hist'])
+            st.plotly_chart(customer_lifetime_value_dict['fig_hist'], use_container_width=True, key="clv_hist_chart")
             st.markdown(
                 f"Train R2 Score: **{customer_lifetime_value_dict['r2_train']}** | Test R2 Score: **{customer_lifetime_value_dict['r2_test']}**")
             st.markdown(f"Mean Absolute Error: **{customer_lifetime_value_dict['mae']}**")
             st.markdown(f"Mean Squared Error: **{customer_lifetime_value_dict['mse']}**")
 
-        # ml models description
+        # ----- ML MODELS DESCRIPTION -----
         with st.expander("EXPAND FOR INFORMATION ON **MACHINE LEARNING INSIGHTS**"):
             des1, des2, des3 = st.columns(3)
-            st.markdown("**NOTE - Model Reliability Percentage** shows how much you can trust the model’s predictions on both past and new data.")
+            st.markdown(
+                "**NOTE - Model Reliability Percentage** shows how much you can trust the model’s predictions on both past and new data.")
             des1.markdown("**Sales Forecasting**: Predicts future sales based on past trends and influencing factors.")
-            des2.markdown("**Customer Segmentation**: Groups customers into clusters based on similar behaviors or attributes.")
-            des3.markdown("**Customer Lifetime Value**: Estimates the total revenue a business can expect from a customer over their lifetime.")
+            des2.markdown(
+                "**Customer Segmentation**: Groups customers into clusters based on similar behaviors or attributes.")
+            des3.markdown(
+                "**Customer Lifetime Value**: Estimates the total revenue a business can expect from a customer over their lifetime.")
 
         st.divider()
 
