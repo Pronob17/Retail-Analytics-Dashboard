@@ -308,134 +308,100 @@ class MachineLearningClass:
 
     def ml_customer_lifetime_value_func(self):
         """
-        Predicts Customer Lifetime Value (CLV) using RFM features and Ridge Regression.
-        Returns prediction results, performance metrics, histogram plot, and reliability score.
-        :return: customer_lifetime_value_dict
+        Calculates Customer Lifetime Value (CLV) using a regression model.
+        Returns a dictionary with predictions, reliability, and visualization.
         """
-
-        # Initialize outputs
-        r2_train = r2_test = mse = mae = reliability_pct = 0
-        reliability_score_combined = "N/A"
-        fig_hist = go.Figure()
-        results_df = pd.DataFrame()
+        clv_dict = {
+            'Sample Results': pd.DataFrame(),
+            'fig_hist': go.Figure(),
+            'Reliability': 'N/A',
+        }
 
         try:
-            ml_cust_lifetime_df = self.ml_df.copy()
-            ml_cust_lifetime_df['Date'] = pd.to_datetime(ml_cust_lifetime_df['Date'])
+            df = self.ml_df.copy()
+            required_cols = ['CustomerID', 'TransactionID', 'Date', 'Quantity', 'UnitPrice', 'DiscountPercent']
 
-            if 'FinalAmount' not in ml_cust_lifetime_df.columns:
-                ml_cust_lifetime_df['FinalAmount'] = (
-                        ml_cust_lifetime_df['Quantity'] * ml_cust_lifetime_df['UnitPrice']
-                )
+            # 1. Column Check
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            if missing_cols:
+                raise ValueError(f"Missing required columns: {missing_cols}")
 
-            snapshot_date = ml_cust_lifetime_df['Date'].max() + pd.Timedelta(days=1)
+            # 2. Convert and clean
+            df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+            df = df.dropna(subset=['Date'])  # Drop rows with invalid dates
 
-            rfm = ml_cust_lifetime_df.groupby('CustomerID').agg({
-                'Date': [
-                    lambda x: (snapshot_date - x.max()).days,
-                    lambda x: (x.max() - x.min()).days
-                ],
+            df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
+            df['UnitPrice'] = pd.to_numeric(df['UnitPrice'], errors='coerce')
+            df['DiscountPercent'] = pd.to_numeric(df['DiscountPercent'], errors='coerce')
+            df = df.dropna(subset=['Quantity', 'UnitPrice', 'DiscountPercent'])  # Clean any NaNs
+
+            if df.empty:
+                raise ValueError("Cleaned dataframe is empty.")
+
+            # 3. Calculate final amount after discount
+            df['FinalAmount'] = df['Quantity'] * df['UnitPrice'] * (1 - df['DiscountPercent'] / 100)
+
+            # 4. Aggregate by customer
+            customer_df = df.groupby('CustomerID').agg({
                 'TransactionID': 'nunique',
                 'FinalAmount': 'sum',
+                'DiscountPercent': 'mean',
                 'Quantity': 'mean',
-                'DiscountPercent': 'mean'
-            })
+                'Date': [lambda x: (x.max() - x.min()).days, 'count']
+            }).reset_index()
 
-            rfm.columns = ['Recency', 'CustomerAge', 'Frequency', 'Monetary', 'AvgQuantity', 'AvgDiscount']
-            rfm.reset_index(inplace=True)
-            rfm.fillna(0, inplace=True)
+            # Rename columns
+            customer_df.columns = [
+                'CustomerID', 'Frequency', 'Monetary', 'AvgDiscount',
+                'AvgQuantity', 'CustomerAge', 'TotalTransactions'
+            ]
 
-            X = rfm[['Recency', 'CustomerAge', 'Frequency', 'AvgQuantity', 'AvgDiscount']]
-            y = rfm['Monetary'].values.reshape(-1, 1)
+            # Handle invalid values
+            customer_df['CustomerAge'] = customer_df['CustomerAge'].fillna(0)
+            customer_df['AvgDiscount'] = customer_df['AvgDiscount'].fillna(0)
+            customer_df['AvgQuantity'] = customer_df['AvgQuantity'].fillna(0)
 
-            scaler_y = StandardScaler()
-            y_scaled = scaler_y.fit_transform(y)
+            # 5. Check minimum data requirement
+            if customer_df.shape[0] < 3:
+                raise ValueError("Insufficient unique customers for CLV modeling.")
 
-            X_train, X_test, y_train, y_test, cust_train, cust_test = train_test_split(
-                X, y_scaled, rfm['CustomerID'], test_size=0.2, random_state=42
-            )
+            # 6. Prepare data for regression
+            X = customer_df[['CustomerAge', 'Frequency', 'AvgDiscount', 'AvgQuantity']]
+            y = customer_df['Monetary']
 
-            model = Ridge(alpha=1.0)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+            if len(X_train) < 2 or len(X_test) < 1:
+                raise ValueError("Insufficient training or testing data.")
+
+            model = LinearRegression()
             model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
 
-            y_train_pred = model.predict(X_train)
-            y_test_pred = model.predict(X_test)
+            r2 = r2_score(y_test, y_pred)
+            clv_dict['Reliability'] = f"{round(r2 * 100, 2)}% ({'Good' if r2 > 0.6 else 'Low'} reliability)"
 
-            y_train_orig = scaler_y.inverse_transform(y_train).flatten()
-            y_train_pred_orig = scaler_y.inverse_transform(y_train_pred.reshape(-1, 1)).flatten()
-            y_test_orig = scaler_y.inverse_transform(y_test).flatten()
-            y_test_pred_orig = scaler_y.inverse_transform(y_test_pred.reshape(-1, 1)).flatten()
+            # 7. Predict CLV for all customers
+            customer_df['CLV_Predicted'] = model.predict(X)
 
-            r2_train = r2_score(y_train_orig, y_train_pred_orig)
-            r2_test = r2_score(y_test_orig, y_test_pred_orig)
-            mse = mean_squared_error(y_test_orig, y_test_pred_orig)
-            mae = mean_absolute_error(y_test_orig, y_test_pred_orig)
+            # 8. Visualization
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(x=customer_df['CLV_Predicted'], nbinsx=20, marker_color='teal'))
+            fig.update_layout(title="Predicted CLV Distribution", xaxis_title="Predicted CLV", yaxis_title="Count")
 
-            reliability_pct = max(0.0, round(r2_test * 100, 2))
-            if reliability_pct >= 80:
-                label = "Excellent"
-            elif reliability_pct >= 60:
-                label = "Good"
-            elif reliability_pct >= 40:
-                label = "Moderate"
-            elif reliability_pct >= 20:
-                label = "Weak"
-            else:
-                label = "Poor"
-            reliability_score_combined = f"{reliability_pct}% ({label} reliability)"
-
-            results_df = pd.DataFrame({
-                'CustomerID': cust_test.values,
-                'Predicted_CLV': y_test_pred_orig,
-                'Actual_CLV': y_test_orig,
-                'Difference': y_test_orig - y_test_pred_orig
-            }).sort_values('Predicted_CLV', ascending=False).reset_index(drop=True)
-
-            fig_hist = go.Figure()
-            fig_hist.add_trace(go.Histogram(
-                x=results_df['Actual_CLV'],
-                name='Actual CLV',
-                opacity=0.6,
-                marker_color='blue'
-            ))
-            fig_hist.add_trace(go.Histogram(
-                x=results_df['Predicted_CLV'],
-                name='Predicted CLV',
-                opacity=0.6,
-                marker_color='orange'
-            ))
-            fig_hist.update_layout(
-                title='Distribution of Actual vs Predicted CLV',
-                xaxis_title='Customer Lifetime Value',
-                yaxis_title='Count',
-                barmode='overlay',
-                legend_title='Type'
-            )
+            # 9. Final output
+            clv_dict['Sample Results'] = customer_df[['CustomerID', 'CLV_Predicted']].sort_values(by='CLV_Predicted',
+                                                                                                  ascending=False).head(
+                10)
+            clv_dict['fig_hist'] = fig
 
         except Exception as e:
             import traceback
             traceback.print_exc()
             log_error(str(e), source="ml_customer_lifetime_value_func")
-            r2_train = r2_test = mse = mae = 0
-            reliability_score_combined = "N/A"
-            fig_hist = go.Figure()
-            results_df = pd.DataFrame()
 
-        customer_lifetime_value_dict = {
-            'r2_train': round(r2_train, 4),
-            'r2_test': round(r2_test, 4),
-            'mse': round(mse, 2),
-            'mae': round(mae, 2),
-            'Reliability': reliability_score_combined,
-            'fig_hist': fig_hist,
-            'Sample Results': (
-                results_df.head(10).sort_values(by='Predicted_CLV', ascending=False)
-                if 'Predicted_CLV' in results_df.columns else
-                pd.DataFrame({"Error": ["Predicted_CLV not found in results_df"]})
-            )
-        }
+        return clv_dict
 
-        return customer_lifetime_value_dict
 
 
 
