@@ -315,33 +315,32 @@ class MachineLearningClass:
             'Sample Results': pd.DataFrame(),
             'fig_hist': go.Figure(),
             'Reliability': 'N/A',
+            'r2_train': "N/A",
+            'r2_test': "N/A",
+            'mae': "N/A",
+            'mse': "N/A",
         }
 
         try:
             df = self.ml_df.copy()
             required_cols = ['CustomerID', 'TransactionID', 'Date', 'Quantity', 'UnitPrice', 'DiscountPercent']
-
-            # 1. Column Check
             missing_cols = [col for col in required_cols if col not in df.columns]
             if missing_cols:
                 raise ValueError(f"Missing required columns: {missing_cols}")
 
-            # 2. Convert and clean
             df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-            df = df.dropna(subset=['Date'])  # Drop rows with invalid dates
+            df = df.dropna(subset=['Date'])
 
             df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
             df['UnitPrice'] = pd.to_numeric(df['UnitPrice'], errors='coerce')
             df['DiscountPercent'] = pd.to_numeric(df['DiscountPercent'], errors='coerce')
-            df = df.dropna(subset=['Quantity', 'UnitPrice', 'DiscountPercent'])  # Clean any NaNs
+            df = df.dropna(subset=['Quantity', 'UnitPrice', 'DiscountPercent'])
 
             if df.empty:
                 raise ValueError("Cleaned dataframe is empty.")
 
-            # 3. Calculate final amount after discount
             df['FinalAmount'] = df['Quantity'] * df['UnitPrice'] * (1 - df['DiscountPercent'] / 100)
 
-            # 4. Aggregate by customer
             customer_df = df.groupby('CustomerID').agg({
                 'TransactionID': 'nunique',
                 'FinalAmount': 'sum',
@@ -350,22 +349,18 @@ class MachineLearningClass:
                 'Date': [lambda x: (x.max() - x.min()).days, 'count']
             }).reset_index()
 
-            # Rename columns
             customer_df.columns = [
                 'CustomerID', 'Frequency', 'Monetary', 'AvgDiscount',
                 'AvgQuantity', 'CustomerAge', 'TotalTransactions'
             ]
 
-            # Handle invalid values
             customer_df['CustomerAge'] = customer_df['CustomerAge'].fillna(0)
             customer_df['AvgDiscount'] = customer_df['AvgDiscount'].fillna(0)
             customer_df['AvgQuantity'] = customer_df['AvgQuantity'].fillna(0)
 
-            # 5. Check minimum data requirement
             if customer_df.shape[0] < 3:
                 raise ValueError("Insufficient unique customers for CLV modeling.")
 
-            # 6. Prepare data for regression
             X = customer_df[['CustomerAge', 'Frequency', 'AvgDiscount', 'AvgQuantity']]
             y = customer_df['Monetary']
 
@@ -376,24 +371,49 @@ class MachineLearningClass:
 
             model = LinearRegression()
             model.fit(X_train, y_train)
-            y_pred = model.predict(X_test)
 
-            r2 = r2_score(y_test, y_pred)
-            clv_dict['Reliability'] = f"{round(r2 * 100, 2)}% ({'Good' if r2 > 0.6 else 'Low'} reliability)"
+            y_pred_test = model.predict(X_test)
+            y_pred_train = model.predict(X_train)
 
-            # 7. Predict CLV for all customers
+            r2_train = r2_score(y_train, y_pred_train)
+            r2_test = r2_score(y_test, y_pred_test)
+            mae = mean_absolute_error(y_test, y_pred_test)
+            mse = mean_squared_error(y_test, y_pred_test)
+
+            reliability_label = "Good" if r2_test > 0.6 else "Low"
+            clv_dict['Reliability'] = f"{round(r2_test * 100, 2)}% ({reliability_label} reliability)"
+            clv_dict['r2_train'] = round(r2_train, 4)
+            clv_dict['r2_test'] = round(r2_test, 4)
+            clv_dict['mae'] = round(mae, 2)
+            clv_dict['mse'] = round(mse, 2)
+
             customer_df['CLV_Predicted'] = model.predict(X)
 
-            # 8. Visualization
+            # ---------- Overlay Histogram ----------
             fig = go.Figure()
-            fig.add_trace(go.Histogram(x=customer_df['CLV_Predicted'], nbinsx=20, marker_color='teal'))
-            fig.update_layout(title="Predicted CLV Distribution", xaxis_title="Predicted CLV", yaxis_title="Count")
-
-            # 9. Final output
-            clv_dict['Sample Results'] = customer_df[['CustomerID', 'CLV_Predicted']].sort_values(by='CLV_Predicted',
-                                                                                                  ascending=False).head(
-                10)
+            fig.add_trace(go.Histogram(
+                x=customer_df['Monetary'],
+                name='Actual CLV',
+                marker_color='blue',
+                opacity=0.6
+            ))
+            fig.add_trace(go.Histogram(
+                x=customer_df['CLV_Predicted'],
+                name='Predicted CLV',
+                marker_color='teal',
+                opacity=0.6
+            ))
+            fig.update_layout(
+                barmode='overlay',
+                title="Actual vs Predicted CLV Distribution",
+                xaxis_title="CLV Value",
+                yaxis_title="Count",
+                legend=dict(x=0.7, y=0.95)
+            )
             clv_dict['fig_hist'] = fig
+
+            clv_dict['Sample Results'] = customer_df[['CustomerID', 'CLV_Predicted']].sort_values(
+                by='CLV_Predicted', ascending=False).head(10)
 
         except Exception as e:
             import traceback
@@ -401,6 +421,9 @@ class MachineLearningClass:
             log_error(str(e), source="ml_customer_lifetime_value_func")
 
         return clv_dict
+
+
+
 
 
 
