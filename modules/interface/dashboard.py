@@ -71,7 +71,7 @@ class DashboardClass:
         st.markdown("## **KEY PERFORMANCE INDICATOR**")
 
         # create the date range input
-        lt, cn, rt = st.columns([1,1,3])
+        lt, cn, rt = st.columns([2,1,3])
         date_range = lt.date_input(
             "SELECT DATE RANGE",
             value=(start_date_default, end_date_default),
