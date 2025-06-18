@@ -60,7 +60,7 @@ def main():
     kpi = BasicAnalyticsClass()
 
     # call the basic analytics function
-    total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value = kpi.kpi_calculation_func(
+    total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value, avg_days_between_purchases = kpi.kpi_calculation_func(
         basic_analytics_df,
         start_date,
         end_date
@@ -72,7 +72,8 @@ def main():
         gross_profit_margin,
         total_customers,
         customer_frequency,
-        average_order_value
+        average_order_value,
+        avg_days_between_purchases
     )
 
     # GRAPHS

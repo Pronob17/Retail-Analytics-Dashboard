@@ -81,4 +81,15 @@ class BasicAnalyticsClass:
             log_error(str(e), source="kpi_calculation_func in basicanalytics.py")
             average_order_value = "N/A"
 
-        return total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value
+        # average time between purchases
+        try:
+            df_sorted = filtered_df.sort_values(['CustomerID', 'Date'])
+            df_sorted['PrevDate'] = df_sorted.groupby('CustomerID')['Date'].shift(1)
+            df_sorted['DaysBetween'] = (df_sorted['Date'] - df_sorted['PrevDate']).dt.days
+            avg_days_between_purchases = round(df_sorted['DaysBetween'].dropna().mean(), 2)
+        except Exception as e:
+            print(e)
+            log_error(str(e), source="kpi_calculation_func in basicanalytics.py")
+            avg_days_between_purchases = "N/A"
+
+        return total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value, avg_days_between_purchases

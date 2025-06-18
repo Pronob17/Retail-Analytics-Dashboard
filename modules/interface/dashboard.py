@@ -87,7 +87,7 @@ class DashboardClass:
 
         return start_date, end_date
 
-    def show_kpi_func(self, total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value):
+    def show_kpi_func(self, total_sales, gross_profit_margin, total_customers, customer_frequency, average_order_value, avg_days_between_purchases):
         """
         Shows the kpis on the dashboard
         :param total_sales:
@@ -95,25 +95,32 @@ class DashboardClass:
         :param total_customers:
         :param customer_frequency:
         :param average_order_value:
+        :param avg_days_between_purchases
         :return: None
         """
 
 
-        col1, col2, col3, col4, col5 = st.columns([2,1,1,1,1])
-        col1.metric("TOTAL SALES", total_sales)
-        col2.metric("GROSS PROFIT MARGIN (%)", gross_profit_margin)
-        col3.metric("TOTAL CUSTOMERS", total_customers)
-        col4.metric("CUSTOMER FREQUENCY", customer_frequency)
-        col5.metric("AVERAGE ORDER VALUE", average_order_value)
+        col11, col12, col13 = st.columns(3)
+        col11.metric("TOTAL SALES", total_sales)
+        col12.metric("GROSS PROFIT MARGIN (%)", gross_profit_margin)
+        col13.metric("AVERAGE TIME BETWEEN PURCHASES", avg_days_between_purchases)
+
+        col21, col22, col23 = st.columns(3)
+        col21.metric("TOTAL CUSTOMERS", total_customers)
+        col22.metric("CUSTOMER FREQUENCY", customer_frequency)
+        col23.metric("AVERAGE ORDER VALUE", average_order_value)
 
         # create an info expander
         with st.expander("EXPAND FOR INFORMATION ON **KEY PERFORMANCE INDICATORS**"):
-            inf1, inf2, inf3, inf4, inf5 = st.columns([2, 1, 1, 1, 1])
+            inf1, inf2, inf3 = st.columns(3)
             inf1.markdown("**TOTAL SALES** – Sum of all sales revenue.")
             inf2.markdown("**GROSS PROFIT MARGIN (%)** – Percentage of revenue remaining after deducting COGS.")
-            inf3.markdown("**TOTAL CUSTOMERS** – Count of unique customers.")
-            inf4.markdown("**CUSTOMER FREQUENCY** – Average number of orders per customer.")
-            inf5.markdown("**AVERAGE ORDER VALUE** – Average sales revenue per order.")
+            inf3.markdown("**AVERAGE TIME BETWEEN PURCHASES** – Average number of days between two purchases by the same customer.")
+
+            inf4, inf5, inf6 = st.columns(3)
+            inf4.markdown("**TOTAL CUSTOMERS** – Count of unique customers.")
+            inf5.markdown("**CUSTOMER FREQUENCY** – Average number of orders per customer.")
+            inf6.markdown("**AVERAGE ORDER VALUE** – Average sales revenue per order.")
 
         # create divider
         st.divider()
