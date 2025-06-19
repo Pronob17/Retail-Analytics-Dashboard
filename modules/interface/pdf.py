@@ -1,6 +1,7 @@
 import os
 from fpdf import FPDF
 import pandas as pd
+import datetime as dt
 
 def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     """
@@ -42,11 +43,17 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf_obj.ln(3)
 
     # --- Title ---
+    add_horizontal_line(pdf, thickness=0.9)
     pdf.set_font("Arial", "B", 24)
     # orange
     pdf.set_text_color(255, 165, 0)
     pdf.cell(0, 10, "RETAIL ANALYTICS REPORT", ln=True, align='C')
     add_horizontal_line(pdf, thickness=0.9)
+    pdf.ln(2)
+    pdf.set_text_color(64, 64, 64)  # Dark gray
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(0, 10, f"{dt.datetime.now()}", ln=True, align='R')
+
     pdf.ln(10)
 
     # --- KPIs Section ---
