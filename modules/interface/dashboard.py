@@ -30,6 +30,28 @@ class DashboardClass:
         # create a divider
         st.divider()
 
+        # create the necessary column
+        # Minimum required columns with unambiguous descriptions
+        dashboard_key_descriptions = {
+            "CustomerID": "Unique ID for each customer, used to track repeat behavior.",
+            "Date": "Date of the transaction (format: YYYY-MM-DD).",
+            "FinalAmount": "Total amount paid by the customer after discounts and taxes.",
+            "SellingPrice": "Per-unit selling price before discounts.",
+            "CostPrice": "Per-unit cost to the business for calculating profit.",
+            "ProductName": "Name or description of the product sold.",
+            "Quantity": "Number of product units sold in the transaction.",
+            "Category": "Product category (e.g., Electronics, Apparel)."
+        }
+
+        # Create DataFrame
+        df_sidebar_keys = pd.DataFrame.from_dict(
+            dashboard_key_descriptions, orient="index", columns=["Description"]
+        )
+
+        # Streamlit sidebar display
+        with st.sidebar.expander("Required Columns for Dashboard to Work"):
+            st.dataframe(df_sidebar_keys)
+
     def upload_func(self):
         """
         Creates upload and demo selectbox.
