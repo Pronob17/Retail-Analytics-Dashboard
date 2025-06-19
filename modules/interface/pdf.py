@@ -8,13 +8,9 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     and ML insights including Customer Lifetime Value (CLV), Customer Segmentation, and Sales Forecasting.
     """
     pdf = FPDF()
+    pdf.set_margins(left=10, top=20, right=10)
     pdf.add_page()
     image_paths = []
-
-    # --- Title ---
-    pdf.set_font("Arial", "B", 20)
-    pdf.cell(0, 10, "Retail Analytics Report", ln=True, align='C')
-    pdf.ln(10)
 
     # --- Horizontal Line Helper ---
     def add_horizontal_line(pdf_obj, thickness=0.5):
@@ -23,7 +19,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf_obj.ln(3)
 
     # --- Helper: Draw DataFrame as Table ---
-    def add_dataframe_section(pdf_obj, df, title, max_rows=5):
+    def add_dataframe_section(pdf_obj, df, title, max_rows=10):
         if df is None or df.empty:
             return
         pdf_obj.ln(5)
@@ -45,19 +41,40 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
             pdf_obj.ln()
         pdf_obj.ln(3)
 
+    # --- Title ---
+    pdf.set_font("Arial", "B", 24)
+    # orange
+    pdf.set_text_color(255, 165, 0)
+    pdf.cell(0, 10, "RETAIL ANALYTICS REPORT", ln=True, align='C')
+    add_horizontal_line(pdf, thickness=0.9)
+    pdf.ln(10)
+
     # --- KPIs Section ---
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Key Performance Indicators (KPIs):", ln=True)
+    pdf.set_font("Arial", "B", 16)
+    # subtopic
+    # blue
+    pdf.set_text_color(0, 0, 128)
+    pdf.cell(0, 10, "Key Performance Indicators (KPIs)", ln=True, align='C')
+    # paragraph gap
+    pdf.ln(5)
+    pdf.set_text_color(64, 64, 64)  # Dark gray
     pdf.set_font("Arial", "", 12)
-    for label, value in kpi_tuple:
+    for i, (label, value) in enumerate(kpi_tuple):
         pdf.cell(0, 8, f"{label}: {value}", ln=True)
-    pdf.ln(8)
+        if i == 1:
+            pdf.ln(5)
+    pdf.ln(10)
 
     # --- Graphs Section ---
     pdf.add_page()
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Visual Insights:", ln=True)
-    pdf.ln(4)
+    pdf.set_font("Arial", "B", 16)
+    # subtopic
+    # blue
+    pdf.set_text_color(0, 0, 128)
+    pdf.cell(0, 10, "Visual Insights", ln=True, align='C')
+    # paragraph gap
+    pdf.ln(5)
+    pdf.set_text_color(64, 64, 64)  # Dark gray
 
     for idx, fig in enumerate(graph_tuple):
         img_path = f"temp_chart_{idx}.png"
@@ -68,8 +85,16 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
 
     # --- Inventory Aging Section ---
     pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    # subtopic
+    # blue
+    pdf.set_text_color(0, 0, 128)
+    pdf.cell(0, 10, "Inventory Aging Table", ln=True, align='C')
+    # paragraph gap
+    pdf.ln(5)
+    pdf.set_text_color(64, 64, 64)  # Dark gray
     if isinstance(inv_tuple, pd.DataFrame):
-        add_dataframe_section(pdf, inv_tuple, "Inventory Aging (Top 5 Rows):")
+        add_dataframe_section(pdf, inv_tuple, "Inventory Aging (Top 10 Rows)")
 
     # -------------------------------
     # ---- SALES FORECASTING -------
@@ -79,9 +104,12 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     if sf:
         add_horizontal_line(pdf)
         pdf.set_font("Arial", "B", 16)
-        pdf.cell(0, 10, "Sales Forecasting Summary:", ln=True)
+        # blue
+        pdf.set_text_color(0, 0, 128)
+        pdf.cell(0, 10, "Sales Forecasting Summary", ln=True, align='C')
         pdf.set_font("Arial", "", 12)
-        pdf.ln(3)
+        pdf.ln(5)
+        pdf.set_text_color(64, 64, 64)  # Dark gray
 
         reliability = sf.get("Reliability Percentage", 'N/A')
         reliability_str = f"{reliability:.2f}%" if isinstance(reliability, (int, float)) else str(reliability)
@@ -94,7 +122,8 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.cell(0, 8, f"Next Day Prediction: {round(sf.get('Next Day Predictions', 0), 2)}", ln=True)
 
         pdf.ln(5)
-        pdf.set_font("Arial", "B", 12)
+        pdf.set_font("Arial", "B", 14)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.cell(0, 10, "TECHNICAL DETAILS OF MODEL RELIABILITY", ln=True)
 
         fig = sf.get("Line Chart Figure")
@@ -112,9 +141,12 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     if seg:
         add_horizontal_line(pdf)
         pdf.set_font("Arial", "B", 16)
-        pdf.cell(0, 10, "Customer Segmentation Summary:", ln=True)
+        # blue
+        pdf.set_text_color(0, 0, 128)
+        pdf.cell(0, 10, "Customer Segmentation Summary", ln=True, align='C')
         pdf.set_font("Arial", "", 12)
-        pdf.ln(3)
+        pdf.ln(5)
+        pdf.set_text_color(64, 64, 64)  # Dark gray
 
         reliability = seg.get("Reliability Percentage", 'N/A')
         reliability_str = f"{reliability:.2f}%" if isinstance(reliability, (int, float)) else str(reliability)
@@ -128,7 +160,8 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         add_dataframe_section(pdf, seg.get("Cluster Summary", pd.DataFrame()), "Cluster Summary")
 
         pdf.ln(5)
-        pdf.set_font("Arial", "B", 12)
+        pdf.set_font("Arial", "B", 14)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.cell(0, 10, "TECHNICAL DETAILS OF MODEL RELIABILITY", ln=True)
 
         fig_elbow = seg.get("Elbow Plot Figure")
@@ -153,17 +186,21 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     if clv:
         add_horizontal_line(pdf)
         pdf.set_font("Arial", "B", 16)
-        pdf.cell(0, 10, "Customer Lifetime Value (CLV) Summary:", ln=True)
+        # blue
+        pdf.set_text_color(0, 0, 128)
+        pdf.cell(0, 10, "Customer Lifetime Value (CLV) Summary", ln=True, align='C')
         pdf.set_font("Arial", "", 12)
-        pdf.ln(3)
+        pdf.ln(5)
+        pdf.set_text_color(64, 64, 64)  # Dark gray
 
         reliability = clv.get("Reliability", 'N/A')
         pdf.cell(0, 8, f"Model Reliability: {reliability}", ln=True)
 
-        add_dataframe_section(pdf, clv.get("Sample Results", pd.DataFrame()), "Top 5 Predicted CLV Customers:")
+        add_dataframe_section(pdf, clv.get("Sample Results", pd.DataFrame()), "Top 10 Predicted CLV Customers:")
 
         pdf.ln(5)
-        pdf.set_font("Arial", "B", 12)
+        pdf.set_font("Arial", "B", 14)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.cell(0, 10, "TECHNICAL DETAILS OF MODEL RELIABILITY", ln=True)
 
         pdf.set_font("Arial", "", 12)
@@ -177,6 +214,8 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
             pdf.image(clv_path, x=10, w=180)
             image_paths.append(clv_path)
 
+    # final end line
+    add_horizontal_line(pdf, thickness=0.9)
     # --- Export PDF as bytes ---
     pdf_bytes = pdf.output(dest='S').encode('latin-1')
 

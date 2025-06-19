@@ -237,10 +237,14 @@ class DashboardClass:
         """
         # create a divider
         st.sidebar.divider()
+
         # create a button
         st.sidebar.download_button(
-            label="📄 DOWNLOAD SUMMARY RESULT",
+            label="📄 DOWNLOAD SUMMARY",
             data=summary_result,
             file_name="Retail_Summary_Result.pdf",
             mime="application/pdf"
         )
+
+        # create a divider
+        st.sidebar.divider()
