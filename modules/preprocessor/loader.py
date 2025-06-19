@@ -52,7 +52,7 @@ class LoaderClass:
         :return: df
         """
         data_path = "./data/"
-        json_path = 'columns_dictionary_full.json'
+        json_path = 'columns_dictionary_restricted.json'
         json_file = data_path + json_path
 
         # load mapping from json file
