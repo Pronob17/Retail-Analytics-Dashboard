@@ -61,7 +61,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.set_font("Arial", "", 12)
     for i, (label, value) in enumerate(kpi_tuple):
         pdf.cell(0, 8, f"{label}: {value}", ln=True)
-        if i == 1:
+        if i == 0:
             pdf.ln(5)
     pdf.ln(10)
 

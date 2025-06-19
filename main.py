@@ -115,8 +115,7 @@ def main():
 
     # 1. KPIs: convert to list of tuples with labels
     kpi_tuple = [
-        ("Starting Date", start_date),
-        ("Ending Date", end_date),
+        ("DATE RANGE", f"Starting Date: {start_date} and Ending Date: {end_date}"),
         ("Total Sales", total_sales),
         ("Gross Profit Margin", gross_profit_margin),
         ("Total Customers", total_customers),
