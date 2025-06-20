@@ -9,4 +9,5 @@ openpyxl
 kneed
 fpdf
 kaleido
+Pillow
 
