@@ -90,7 +90,7 @@ class DashboardClass:
         :return: start_date, end_date
         """
         # kpi title
-        st.markdown("## **KEY PERFORMANCE INDICATOR**")
+        st.markdown("## **KEY PERFORMANCE INDICATORS**")
 
         # create the date range input
         lt, cn, rt = st.columns([2,1,3])

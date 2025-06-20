@@ -68,7 +68,22 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.cell(0, 8, f"{label}: {value}", ln=True)
         if i == 0:
             pdf.ln(5)
+
+    # KPI description section
     pdf.ln(10)
+    pdf.set_font("Arial", "", 12)
+    pdf.set_text_color(90, 90, 90)
+    pdf.cell(0, 10, "What does the above mean?", ln=True)
+    pdf.set_text_color(130, 130, 130)  # Light gray
+    pdf.multi_cell(0, 8,
+                   "This section presents 6 key performance indicators (KPIs):\n"
+                   "- Total Sales (in amount): The overall revenue generated in the selected period.\n"
+                   "- Gross Profit Margin (in percentages): Percentage of sales retained after deducting the cost of goods sold.\n"
+                   "- Total Customers: Unique number of customers who made purchases.\n"
+                   "- Customer Frequency: How often, on average, customers return to make another purchase.\n"
+                   "- Average Order Value (in amount): The mean amount spent per order.\n"
+                   "- Average Days Between Purchases: Helps understand buying intervals, indicating customer loyalty or drop-off.",
+                   0, "L")
 
     # --- Graphs Section ---
     pdf.add_page()
@@ -88,6 +103,19 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.image(img_path, x=10, w=180)
         pdf.ln(5)
 
+    # Graph description section
+    pdf.ln(10)
+    pdf.set_font("Arial", "", 12)
+    pdf.set_text_color(90, 90, 90)
+    pdf.cell(0, 10, "What does the above mean?", ln=True)
+    pdf.set_text_color(130, 130, 130)  # Light gray
+    pdf.multi_cell(0, 8,
+                   "This section visualizes important patterns from your data:\n"
+                   "- Trend Analysis: Tracks revenue performance across time to highlight seasonality or growth trends.\n"
+                   "- Top 20 Bestselling Products: Lists the highest-selling products by quantity or revenue.\n"
+                   "- Profit Margin by Category: Shows which product categories are contributing most to profit.",
+                   0, "L")
+
     # --- Inventory Aging Section ---
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
@@ -100,6 +128,18 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.set_text_color(64, 64, 64)  # Dark gray
     if isinstance(inv_tuple, pd.DataFrame):
         add_dataframe_section(pdf, inv_tuple, "Inventory Aging (Top 10 Rows)")
+
+    # Inventory aging table description
+    pdf.ln(10)
+    pdf.set_font("Arial", "", 12)
+    pdf.set_text_color(90, 90, 90)
+    pdf.cell(0, 10, "What does the above mean?", ln=True)
+    pdf.set_text_color(130, 130, 130)  # Light gray
+    pdf.multi_cell(0, 8,
+                   "This table breaks down your inventory based on how long items have remained unsold:\n"
+                   "- It helps you identify aging stock that may need clearance or discounting.\n"
+                   "- Useful for optimizing stock rotation, warehouse space, and cash flow planning.",
+                   0, "L")
 
     # -------------------------------
     # ---- SALES FORECASTING -------
@@ -137,6 +177,19 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
             fig.write_image(img_path)
             pdf.image(img_path, x=10, w=180)
             image_paths.append(img_path)
+
+        # sales forecasting description
+        pdf.ln(10)
+        pdf.set_font("Arial", "", 12)
+        pdf.set_text_color(90, 90, 90)
+        pdf.cell(0, 10, "What does the above mean?", ln=True)
+        pdf.set_text_color(130, 130, 130)  # Light gray
+        pdf.multi_cell(0, 8,
+                       "This section displays future sales predictions using machine learning:\n"
+                       "- Sales Forecasting uses historical sales data to project future revenue.\n"
+                       "- Helps in planning for demand, optimizing inventory levels, and avoiding stockouts or overstock.\n"
+                       "- Useful for aligning marketing campaigns and staffing based on expected sales volume.",
+                       0, "L")
 
     # -------------------------------
     # ---- CUSTOMER SEGMENTATION ---
@@ -183,6 +236,19 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
             pdf.image(cluster_path, x=10, w=180)
             image_paths.append(cluster_path)
 
+        # customer segmentation description
+        pdf.ln(10)
+        pdf.set_font("Arial", "", 12)
+        pdf.set_text_color(90, 90, 90)
+        pdf.cell(0, 10, "What does the above mean?", ln=True)
+        pdf.set_text_color(130, 130, 130)  # Light gray
+        pdf.multi_cell(0, 8,
+                       "This section shows how customers are grouped using clustering algorithms:\n"
+                       "- Customer Segmentation uses K-Means to group customers with similar purchase behaviors.\n"
+                       "- Segments may include high-value repeat buyers, occasional shoppers, or one-time customers.\n"
+                       "- Helps tailor marketing strategies, offers, and communications for each segment.",
+                       0, "L")
+
     # -------------------------------
     # ---- CUSTOMER LIFETIME VALUE -
     # -------------------------------
@@ -218,6 +284,19 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
             fig.write_image(clv_path)
             pdf.image(clv_path, x=10, w=180)
             image_paths.append(clv_path)
+
+        # customer lifetime value description
+        pdf.ln(10)
+        pdf.set_font("Arial", "", 12)
+        pdf.set_text_color(90, 90, 90)
+        pdf.cell(0, 10, "What does the above mean?", ln=True)
+        pdf.set_text_color(130, 130, 130)  # Light gray
+        pdf.multi_cell(0, 8,
+                       "This section estimates how valuable each customer is over the long term:\n"
+                       "- Customer Lifetime Value (CLV) predicts the total revenue a customer is expected to bring over their relationship.\n"
+                       "- Helps identify high-value customers worth retaining and nurturing.\n"
+                       "- Useful for prioritizing loyalty campaigns and customer service investments.",
+                       0, "L")
 
     # final end line
     add_horizontal_line(pdf, thickness=0.9)
