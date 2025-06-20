@@ -11,8 +11,8 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
+import seaborn as sns
+import matplotlib.pyplot as plt
 import streamlit as st
 
 from tests.errorlog import log_error
@@ -46,7 +46,7 @@ class MachineLearningClass:
         """
         Imputes and scales the cleaned_date_main_df dataframe using SimpleImputer for the numerical columns and scales it too.
         Calculates the sales forecasting for test data and most importantly, the next day's Final Amount.
-        :return: sales_forecast_dict,
+        :return: sales_forecast_dict
         """
         ml_linear_regression_df = self.ml_df.copy()
 
@@ -61,89 +61,70 @@ class MachineLearningClass:
             X = ml_final_df.drop('FinalAmount', axis=1)
             y = ml_final_df['FinalAmount']
 
-            # create pipeline for preprocessing
+            # train-test split
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=17)
 
-            # create the pipeline object
+            # pipeline
             pipeline = Pipeline(steps=[
                 ('imputer', SimpleImputer(strategy='median', add_indicator=True)),
                 ('scaler', StandardScaler()),
                 ('model', LinearRegression())
             ])
 
-            # fit the model
+            # fit
             pipeline.fit(X_train, y_train)
 
             # scores
             train_score = pipeline.score(X_train, y_train)
             test_score = pipeline.score(X_test, y_test)
 
-            # predicting the test set
+            # prediction
             y_pred = pipeline.predict(X_test)
 
-            # create dataframe of predictions
+            # prediction dataframe
             sales_forecast_df = pd.DataFrame({
-                'Actual Final Amount':y_test,
+                'Actual Final Amount': y_test,
                 'Predicted Final Amount': y_pred
             })
 
-            # Add predictions back to the test set DataFrame (***IMPORTANT FOR GETTING THE DATAFRAME***)
+            # attach predictions to test set
             test_df = self.ml_df.loc[y_test.index].copy()
             test_df['Predicted Final Amount'] = y_pred
-            test_df['Actual Final Amount'] = y_test  # ensure actual is aligned (redundant but explicit)
-            # sort values
+            test_df['Actual Final Amount'] = y_test
             test_df = test_df.sort_values(by='Date')
-
-            # resample by month
             test_df.set_index('Date', inplace=True)
-            monthly_df = test_df.resample('M').sum(numeric_only=True)
-            monthly_df = monthly_df.reset_index()
 
-            # Create line chart comparing actual and predicted
-            fig = go.Figure()
+            # monthly resample
+            monthly_df = test_df.resample('M').sum(numeric_only=True).reset_index()
 
-            # Actual values (red)
-            fig.add_trace(go.Scatter(
-                x=monthly_df['Date'],
-                y=monthly_df['Actual Final Amount'],
-                mode='lines+markers',
-                name='Actual Final Amount',
-                line=dict(color='red')
-            ))
+            # seaborn lineplot
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.lineplot(data=monthly_df, x='Date', y='Actual Final Amount', marker='o',
+                         label='Actual Final Amount', color='red', ax=ax)
+            sns.lineplot(data=monthly_df, x='Date', y='Predicted Final Amount', marker='o',
+                         label='Predicted Final Amount', color='blue', ax=ax)
 
-            # Predicted values (blue)
-            fig.add_trace(go.Scatter(
-                x=monthly_df['Date'],
-                y=monthly_df['Predicted Final Amount'],
-                mode='lines+markers',
-                name='Predicted Final Amount',
-                line=dict(color='blue')
-            ))
-
-            fig.update_layout(
-                title='Actual vs Predicted Final Amount (MONTHLY)',
-                xaxis_title='Date',
-                yaxis_title='Final Amount',
-                template='plotly_white',
-                legend_title='Legend'
-            )
+            ax.set_title('Actual vs Predicted Final Amount (MONTHLY)', fontsize=14)
+            ax.set_xlabel('Date', fontsize=12)
+            ax.set_ylabel('Final Amount', fontsize=12)
+            ax.legend(title='Legend')
+            ax.grid(True)
+            plt.xticks(rotation=45)
+            plt.tight_layout()
 
             # next day forecast
             last_day = ml_linear_regression_df['Date'].max()
-            next_day = last_day + pd.Timedelta(days=1)
-            next_day = next_day.date()
-            # Calculate lifetime average of features (mean of all numerical columns except target)
-            lifetime_avg_features = X.mean().values.reshape(1, -1)  # reshape for prediction (1 sample, n features)
+            next_day = (last_day + pd.Timedelta(days=1)).date()
 
-            # Predict next day FinalAmount using lifetime averages
+            # average features for prediction
+            lifetime_avg_features = X.mean().values.reshape(1, -1)
             next_day_prediction = pipeline.predict(lifetime_avg_features)[0]
 
         except Exception as e:
             print(e)
             log_error(str(e), source="ml_sales_forecasting_func in machinelearningoperations.py")
             sales_forecast_df = pd.DataFrame(columns=['Actual Final Amount', 'Predicted Final Amount'])
-            fig = go.Figure()
-            # exception handling
+            fig, ax = plt.subplots()
             train_score = 0
             test_score = 0
             next_day = 0
@@ -156,7 +137,7 @@ class MachineLearningClass:
             'Reliability Percentage': round(((train_score + test_score) / 2), 2) * 100,
             'Next Day': next_day,
             'Next Day Predictions': next_day_prediction,
-            'Line Chart Figure': fig
+            'Line Chart Figure': fig  # You can save this or render it in Streamlit using st.pyplot(fig)
         }
 
         return sales_forecast_dict
@@ -164,25 +145,23 @@ class MachineLearningClass:
     def ml_customer_segmentation_func(self, k_range=range(1, 11), plot=True):
         """
         Performs RFM-based customer segmentation using KMeans.
-        Uses pipeline with scaling, finds optimal K using elbow (Plotly), performs PCA and returns all results.
+        Uses pipeline with scaling, finds optimal K using elbow (Seaborn), performs PCA and returns all results.
         :param k_range: Range of K values to test (e.g., range(1, 11))
-        :param plot: Whether to generate elbow plot in Plotly
+        :param plot: Whether to generate elbow plot
         :return: Dictionary of results
         """
         best_k = 0
-        fig_cluster = None
         fig_elbow = None
+        fig_cluster = None
         rfm = pd.DataFrame()
         summary_df = pd.DataFrame()
         reliability_percentage = 0
 
         try:
-            # ✅ Use the ML dataframe
+            # Load and clean
             ml_customer_segmentation_df = self.ml_df.copy()
-
             ml_customer_segmentation_df['Date'] = pd.to_datetime(ml_customer_segmentation_df['Date'])
 
-            # Create FinalAmount if not present
             if 'FinalAmount' not in ml_customer_segmentation_df.columns:
                 ml_customer_segmentation_df['FinalAmount'] = (
                         ml_customer_segmentation_df['Quantity'] * ml_customer_segmentation_df['UnitPrice']
@@ -190,7 +169,7 @@ class MachineLearningClass:
 
             snapshot_date = ml_customer_segmentation_df['Date'].max() + pd.Timedelta(days=1)
 
-            # RFM computation
+            # RFM Computation
             rfm = ml_customer_segmentation_df.groupby('CustomerID').agg({
                 'Date': lambda x: (snapshot_date - x.max()).days,
                 'TransactionID': 'nunique',
@@ -200,7 +179,7 @@ class MachineLearningClass:
 
             X = rfm[['Recency', 'Frequency', 'Monetary']]
 
-            # Elbow Method
+            # Elbow method
             wcss = []
             for k in k_range:
                 pipeline = Pipeline([
@@ -211,66 +190,54 @@ class MachineLearningClass:
                 inertia = pipeline.named_steps['kmeans'].inertia_
                 wcss.append(inertia)
 
-            # Find best k
             kl = KneeLocator(k_range, wcss, curve='convex', direction='decreasing')
             best_k = kl.elbow or 3
 
-            # Plotly Elbow Plot
+            # Elbow Plot using Seaborn
             if plot:
-                fig_elbow = go.Figure()
-                fig_elbow.add_trace(go.Scatter(
-                    x=list(k_range),
-                    y=wcss,
-                    mode='lines+markers',
-                    name='WCSS',
-                    line=dict(color='blue')
-                ))
-                fig_elbow.add_vline(
-                    x=best_k,
-                    line=dict(color='red', dash='dash'),
-                    annotation_text=f"Elbow at k={best_k}",
-                    annotation_position="top right"
-                )
-                fig_elbow.update_layout(
-                    title='Elbow Method - Optimal K',
-                    xaxis_title='Number of Clusters (K)',
-                    yaxis_title='WCSS (Inertia)',
-                    template='plotly_white'
-                )
+                fig_elbow, ax1 = plt.subplots(figsize=(8, 5))
+                sns.lineplot(x=list(k_range), y=wcss, marker='o', ax=ax1, color='blue', label='WCSS')
+                ax1.axvline(x=best_k, color='red', linestyle='--', label=f'Elbow at k={best_k}')
+                ax1.set_title('Elbow Method - Optimal K')
+                ax1.set_xlabel('Number of Clusters (K)')
+                ax1.set_ylabel('WCSS (Inertia)')
+                ax1.legend()
+                ax1.grid(True)
+                plt.tight_layout()
 
-            # Final Model
+            # Final clustering
             final_pipeline = Pipeline([
                 ('scaler', StandardScaler()),
                 ('kmeans', KMeans(n_clusters=best_k, random_state=42))
             ])
             rfm['Segment'] = final_pipeline.fit_predict(X)
 
-            # PCA for 2D visualization
+            # PCA
             scaled_X = final_pipeline.named_steps['scaler'].transform(X)
             pca = PCA(n_components=2)
             pca_result = pca.fit_transform(scaled_X)
             rfm['PCA1'] = pca_result[:, 0]
             rfm['PCA2'] = pca_result[:, 1]
 
-            fig_cluster = px.scatter(
-                rfm, x='PCA1', y='PCA2', color='Segment',
-                hover_data=['CustomerID', 'Recency', 'Frequency', 'Monetary'],
-                title=f'Customer Segmentation with K={best_k}',
-                template='plotly_white'
-            )
+            # Cluster Scatterplot using Seaborn
+            fig_cluster, ax2 = plt.subplots(figsize=(8, 6))
+            sns.scatterplot(data=rfm, x='PCA1', y='PCA2', hue='Segment', palette='tab10', ax=ax2, s=60)
+            ax2.set_title(f'Customer Segmentation with K={best_k}')
+            ax2.set_xlabel('PCA Component 1')
+            ax2.set_ylabel('PCA Component 2')
+            ax2.legend(title='Segment')
+            ax2.grid(True)
+            plt.tight_layout()
 
+            # Segment Summary
             summary_df = rfm.groupby('Segment')[['Recency', 'Frequency', 'Monetary']].mean()
             summary_df['Number of Customers'] = rfm['Segment'].value_counts().sort_index()
             summary_df = summary_df.reset_index()
 
-            # Calculate Davies-Bouldin Index
+            # Reliability Score
             dbi_score = davies_bouldin_score(scaled_X, rfm['Segment'])
-
-
-            # Convert to reliability %
             reliability_percentage = round(max(0.0, 1 - (dbi_score / 2)) * 100, 2)
 
-            # Determine quality label
             if dbi_score < 0.5:
                 reliability_label = "Excellent"
             elif dbi_score < 0.8:
@@ -282,18 +249,16 @@ class MachineLearningClass:
             else:
                 reliability_label = "Poor"
 
-            # Combine into a single string
             reliability_score_combined = f"{reliability_percentage}% ({reliability_label} reliability)"
 
         except Exception as e:
             print(e)
-            log_error(str(e), source="customer_segmentation_func (Plotly Version)")
-            # Create empty fallback figures
+            log_error(str(e), source="customer_segmentation_func (Seaborn Version)")
+            fig_elbow, ax1 = plt.subplots()
+            ax1.set_title("Error: Elbow plot not available")
+            fig_cluster, ax2 = plt.subplots()
+            ax2.set_title("Error: Cluster plot not available")
             reliability_score_combined = "N/A"
-            fig_elbow = go.Figure()
-            fig_elbow.update_layout(title="Error: Elbow plot not available")
-            fig_cluster = go.Figure()
-            fig_cluster.update_layout(title="Error: Cluster plot not available")
 
         customer_segment_dict = {
             'Best K': best_k,
@@ -313,7 +278,7 @@ class MachineLearningClass:
         """
         clv_dict = {
             'Sample Results': pd.DataFrame(),
-            'fig_hist': go.Figure(),
+            'fig_hist': None,
             'Reliability': 'N/A',
             'r2_train': "N/A",
             'r2_test': "N/A",
@@ -389,27 +354,21 @@ class MachineLearningClass:
 
             customer_df['CLV_Predicted'] = model.predict(X)
 
-            # ---------- Overlay Histogram ----------
-            fig = go.Figure()
-            fig.add_trace(go.Histogram(
-                x=customer_df['Monetary'],
-                name='Actual CLV',
-                marker_color='blue',
-                opacity=0.6
-            ))
-            fig.add_trace(go.Histogram(
-                x=customer_df['CLV_Predicted'],
-                name='Predicted CLV',
-                marker_color='teal',
-                opacity=0.6
-            ))
-            fig.update_layout(
-                barmode='overlay',
-                title="Actual vs Predicted CLV Distribution",
-                xaxis_title="CLV Value",
-                yaxis_title="Count",
-                legend=dict(x=0.7, y=0.95)
-            )
+            # ---------- Overlay Histogram using Seaborn ----------
+            fig, ax = plt.subplots(figsize=(10, 6))
+
+            sns.histplot(customer_df['Monetary'], kde=False, color='blue', label='Actual CLV', bins=30, alpha=0.6,
+                         ax=ax)
+            sns.histplot(customer_df['CLV_Predicted'], kde=False, color='teal', label='Predicted CLV', bins=30,
+                         alpha=0.6, ax=ax)
+
+            ax.set_title("Actual vs Predicted CLV Distribution", fontsize=14)
+            ax.set_xlabel("CLV Value", fontsize=12)
+            ax.set_ylabel("Count", fontsize=12)
+            ax.legend()
+            ax.grid(True)
+            plt.tight_layout()
+
             clv_dict['fig_hist'] = fig
 
             clv_dict['Sample Results'] = customer_df[['CustomerID', 'CLV_Predicted']].sort_values(

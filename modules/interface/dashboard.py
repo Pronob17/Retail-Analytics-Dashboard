@@ -3,7 +3,8 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 import pandas as pd
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from tests.errorlog import log_error
 
@@ -157,20 +158,29 @@ class DashboardClass:
 
     def show_graphs_func(self, trend_analysis_graph, top_bestselling_products_graph, profit_margin_by_category_graph):
         """
-        Graph showing the analysis.
+        Graph showing the analysis using Matplotlib/Seaborn.
         :param trend_analysis_graph, top_bestselling_products_graph, profit_margin_by_category_graph
         :return: None
         """
         lt, cn, rt = st.tabs(['TREND ANALYSIS', 'TOP 20 BESTSELLING PRODUCTS', 'PROFIT MARGIN BY CATEGORY'])
-        lt.plotly_chart(trend_analysis_graph, key="trend_analysis")
-        cn.plotly_chart(top_bestselling_products_graph, key="top_products")
-        rt.plotly_chart(profit_margin_by_category_graph, key="profit_margin")
+
+        with lt:
+            st.pyplot(trend_analysis_graph)
+
+        with cn:
+            st.pyplot(top_bestselling_products_graph)
+
+        with rt:
+            st.pyplot(profit_margin_by_category_graph)
 
         with st.expander("EXPAND FOR INFORMATION ON **GRAPHS**"):
             d1, d2, d3 = st.columns(3)
             d1.markdown("**TREND ANALYSIS** – Displays how total sales changes over time.")
-            d2.markdown("**TOP 20 BESTSELLING PRODUCTS** – Shows the highest-selling products based on sales volume or revenue.")
+            d2.markdown(
+                "**TOP 20 BESTSELLING PRODUCTS** – Shows the highest-selling products based on sales volume or revenue.")
             d3.markdown("**PROFIT MARGIN BY CATEGORY** – Compares profit margins across different product categories.")
+
+        st.divider()
 
         # create divider
         st.divider()
@@ -205,7 +215,7 @@ class DashboardClass:
         # ----- SALES FORECASTING TAB -----
         ml1.success(
             f"Next day's ({sales_forecast_dict['Next Day']}) Final Amount Forecast: **{sales_forecast_dict['Next Day Predictions']:.2f}**")
-        ml1.plotly_chart(sales_forecast_dict['Line Chart Figure'], use_container_width=True, key="sales_forecast_chart")
+        ml1.pyplot(sales_forecast_dict['Line Chart Figure'], use_container_width=True)
         ml1.info(f"Model Reliability Percentage: **{sales_forecast_dict['Reliability Percentage']}%**")
 
         # additional verification details
@@ -220,10 +230,8 @@ class DashboardClass:
         ml2.info(f"Model Reliability Percentage: **{customer_segmentation_dict['Reliability Percentage']}**")
 
         with ml2.expander("Technical Details of Model's Reliability"):
-            st.plotly_chart(customer_segmentation_dict['Elbow Plot Figure'], use_container_width=True,
-                            key="elbow_plot_chart")
-            st.plotly_chart(customer_segmentation_dict['Scatter Plot Figure'], use_container_width=True,
-                            key="scatter_plot_chart")
+            st.pyplot(customer_segmentation_dict['Elbow Plot Figure'], use_container_width=True)
+            st.pyplot(customer_segmentation_dict['Scatter Plot Figure'], use_container_width=True)
             st.dataframe(customer_segmentation_dict['Segmented RFM Dataframe'])
 
         # ----- CUSTOMER LIFETIME VALUE TAB -----
@@ -232,7 +240,7 @@ class DashboardClass:
         ml3.info(f"Model Reliability: **{customer_lifetime_value_dict['Reliability']}**")
 
         with ml3.expander("Technical Details of Model's Reliability"):
-            st.plotly_chart(customer_lifetime_value_dict['fig_hist'], use_container_width=True, key="clv_hist_chart")
+            st.pyplot(customer_lifetime_value_dict['fig_hist'], use_container_width=True)
             st.markdown(
                 f"Train R2 Score: **{customer_lifetime_value_dict['r2_train']}** | Test R2 Score: **{customer_lifetime_value_dict['r2_test']}**")
             st.markdown(f"Mean Absolute Error: **{customer_lifetime_value_dict['mae']}**")

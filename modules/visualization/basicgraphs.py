@@ -1,8 +1,7 @@
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+import seaborn as sns
+import matplotlib.pyplot as plt
 from tests.errorlog import log_error
-
 
 class BasicGraphsClass:
     def __init__(self, basic_analytics_df, selection):
@@ -10,20 +9,12 @@ class BasicGraphsClass:
         self.data = None
         self.today = pd.Timestamp.now().normalize()
 
-        # Placeholder empty figure
-        self.empty_fig = go.Figure()
-        self.empty_fig.update_layout(
-            title="No Data Available",
-            xaxis={"visible": False},
-            yaxis={"visible": False},
-            annotations=[{
-                "text": "No chart to display",
-                "xref": "paper",
-                "yref": "paper",
-                "showarrow": False,
-                "font": {"size": 20}
-            }]
-        )
+        # Placeholder empty fig
+        fig, ax = plt.subplots()
+        ax.set_title("No Data Available")
+        ax.text(0.5, 0.5, "No chart to display", fontsize=16, ha='center')
+        ax.axis('off')
+        self.empty_fig = fig
 
         # --- Data validation ---
         if "Date" not in basic_analytics_df.columns:
@@ -39,7 +30,6 @@ class BasicGraphsClass:
         start_of_week = self.today - pd.Timedelta(days=self.today.weekday())
         end_of_week = start_of_week + pd.Timedelta(days=6)
 
-        # --- Time-based filters directly from df ---
         daily_data = df[df["Date"].dt.date == self.today.date()]
         weekly_data = df[(df["Date"] >= start_of_week) & (df["Date"] <= end_of_week)]
         monthly_data = df[(df["Date"].dt.month == self.today.month) & (df["Date"].dt.year == self.today.year)]
@@ -68,14 +58,14 @@ class BasicGraphsClass:
             totals = self.data.groupby(self.data['Date'].dt.to_period('M'))['FinalAmount'].sum().reset_index()
             totals['Date'] = totals['Date'].dt.to_timestamp()
 
-            fig = px.line(
-                totals,
-                x='Date',
-                y='FinalAmount',
-                title=f"{self.selection}'s Monthly Sales",
-                labels={'FinalAmount': 'Total Sales'},
-                markers=True
-            )
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.lineplot(data=totals, x='Date', y='FinalAmount', marker='o', ax=ax)
+            ax.set_title(f"{self.selection}'s Monthly Sales")
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Total Sales')
+            ax.grid(True)
+            plt.xticks(rotation=45)
+            plt.tight_layout()
         except Exception as e:
             print(e)
             log_error(str(e), source="trend_analysis_graph_func in basicgraph.py")
@@ -93,14 +83,13 @@ class BasicGraphsClass:
             df_top = top_products.reset_index()
             df_top.columns = ["ProductName", "SalesCount"]
 
-            fig = px.bar(
-                df_top,
-                x="ProductName",
-                y="SalesCount",
-                color="ProductName",
-                title=f"{self.selection}'s Top 20 Bestselling Products",
-                color_discrete_sequence=px.colors.qualitative.Plotly
-            )
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.barplot(data=df_top, x="SalesCount", y="ProductName", palette="viridis", ax=ax)
+            ax.set_title(f"{self.selection}'s Top 20 Bestselling Products")
+            ax.set_xlabel('Sales Count')
+            ax.set_ylabel('Product Name')
+            ax.grid(True)
+            plt.tight_layout()
         except Exception as e:
             print(e)
             log_error(str(e), source="top_bestselling_products_graph_func in basicgraph.py")
@@ -140,14 +129,13 @@ class BasicGraphsClass:
 
             grouped = grouped.sort_values("Profit_Margin (%)", ascending=False)
 
-            fig = px.bar(
-                grouped,
-                x="Category",
-                y="Profit_Margin (%)",
-                color="Profit_Margin (%)",
-                title=f"{self.selection}'s Profit Margin By Category",
-                color_continuous_scale="Viridis"
-            )
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.barplot(data=grouped, x="Profit_Margin (%)", y="Category", palette="magma", ax=ax)
+            ax.set_title(f"{self.selection}'s Profit Margin By Category")
+            ax.set_xlabel('Profit Margin (%)')
+            ax.set_ylabel('Category')
+            ax.grid(True)
+            plt.tight_layout()
         except Exception as e:
             print(e)
             log_error(str(e), source="profit_margin_by_category_graph_func in basicgraph.py")
