@@ -74,7 +74,9 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     # KPIs
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 128)
+    add_horizontal_line(pdf)
     pdf.cell(0, 10, "Key Performance Indicators (KPIs)", ln=True, align='C')
+    add_horizontal_line(pdf)
     pdf.ln(5)
     pdf.set_text_color(64, 64, 64)
     pdf.set_font("Arial", "", 12)
@@ -102,7 +104,9 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 128)
+    add_horizontal_line(pdf)
     pdf.cell(0, 10, "Visual Insights", ln=True, align='C')
+    add_horizontal_line(pdf)
     pdf.ln(5)
     pdf.set_text_color(64, 64, 64)
     for idx, fig in enumerate(graph_tuple):
@@ -127,7 +131,9 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 128)
+    add_horizontal_line(pdf)
     pdf.cell(0, 10, "Inventory Aging Table", ln=True, align='C')
+    add_horizontal_line(pdf)
     pdf.set_text_color(64, 64, 64)
     if isinstance(inv_tuple, pd.DataFrame):
         add_dataframe_section(pdf, inv_tuple, "Inventory Aging (Top 10 Rows)")
@@ -152,6 +158,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.set_font("Arial", "B", 16)
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Sales Forecasting Summary", ln=True, align='C')
+        add_horizontal_line(pdf)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(64, 64, 64)
         pdf.cell(0, 8, f"Model Reliability: {sf.get('Reliability Percentage', 'N/A')}", ln=True)
@@ -184,6 +191,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.set_font("Arial", "B", 16)
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Customer Segmentation Summary", ln=True, align='C')
+        add_horizontal_line(pdf)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(64, 64, 64)
         pdf.cell(0, 8, f"Model Reliability: {seg.get('Reliability Percentage', 'N/A')}", ln=True)
@@ -220,6 +228,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.set_font("Arial", "B", 16)
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Customer Lifetime Value (CLV)", ln=True, align='C')
+        add_horizontal_line(pdf)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(64, 64, 64)
         pdf.cell(0, 8, f"Model Reliability: {clv.get('Reliability', 'N/A')}", ln=True)
@@ -245,6 +254,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         ))
 
     # Final cleanup
+    pdf.ln(10)
     add_horizontal_line(pdf, thickness=0.9)
     pdf_bytes = pdf.output(dest='S').encode('latin-1')
 
