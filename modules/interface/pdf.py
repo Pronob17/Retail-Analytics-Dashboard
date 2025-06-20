@@ -89,13 +89,14 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.cell(0, 10, "What does the above mean?", ln=True)
     pdf.set_text_color(130, 130, 130)
     pdf.multi_cell(0, 8, (
-        "This section presents 6 key performance indicators (KPIs):\n"
-        "- Total Sales: Overall revenue.\n"
-        "- Gross Profit Margin: Profitability percentage.\n"
-        "- Total Customers: Count of unique customers.\n"
-        "- Customer Frequency: Repeat purchase rate.\n"
-        "- Average Order Value: Mean purchase size.\n"
-        "- Avg Days Between Purchases: Time gap in repeat buying."))
+        "This section presents six key performance indicators (KPIs) based on the selected date range. Each metric is designed to summarize a specific aspect of business activity and can be interpreted in relation to the reported values:\n\n"
+        "- Total Sales: The total monetary value of all completed transactions during the period. Higher values indicate stronger revenue generation.\n"
+        "- Gross Profit Margin: The percentage of revenue retained after subtracting the cost of goods sold. Higher margins reflect better pricing power or cost efficiency.\n"
+        "- Total Customers: The count of unique individuals who made purchases. A higher count suggests broader market reach or improved customer acquisition.\n"
+        "- Customer Frequency: The average number of purchases made per customer. Higher frequency reflects stronger customer retention and repeat engagement.\n"
+        "- Average Order Value: The mean value of individual transactions. Larger values may indicate upselling success, premium offerings, or bundled purchases.\n"
+        "- Average Days Between Purchases: The typical number of days between repeat purchases by the same customer. Shorter intervals indicate faster buying cycles and more frequent engagement."
+    ))
 
     # Graphs
     pdf.add_page()
@@ -116,10 +117,11 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.cell(0, 10, "What does the above mean?", ln=True)
     pdf.set_text_color(130, 130, 130)
     pdf.multi_cell(0, 8, (
-        "This section visualizes patterns in your data:\n"
-        "- Trend Analysis: Sales performance over time.\n"
-        "- Top 20 Bestselling Products: Highest-selling items.\n"
-        "- Profit Margin by Category: Most profitable categories."))
+        "This section visualizes key patterns and trends derived from the selected data range. These charts provide context for evaluating performance dynamics, product demand, and profitability distribution:\n\n"
+        "- Trend Analysis: Illustrates the progression of total sales over time, helping to identify growth trends, seasonal cycles, or declining phases.\n"
+        "- Top 20 Bestselling Products: Displays the products with the highest sales volumes during the selected period. High-ranking items indicate strong demand or successful promotion.\n"
+        "- Profit Margin by Category: Compares profit margins across product categories by evaluating revenue relative to direct costs. Categories with higher margins contribute more effectively to overall profitability."
+    ))
 
     # Inventory Aging
     pdf.add_page()
@@ -136,10 +138,11 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.cell(0, 10, "What does the above mean?", ln=True)
     pdf.set_text_color(130, 130, 130)
     pdf.multi_cell(0, 8, (
-        "This table highlights aging inventory:\n"
-        "- Detects old stock needing clearance.\n"
-        "- Aids in stock rotation planning.\n"
-        "- Optimizes space and cash flow."))
+        "This table provides an overview of inventory aging, showing how long different products have remained in stock without being sold. The information supports stock management and operational efficiency:\n\n"
+        "- Highlights items with extended holding periods, which may require discounting, clearance, or promotional action.\n"
+        "- Aids in stock rotation planning to ensure older inventory is prioritized before reaching obsolescence.\n"
+        "- Contributes to better space utilization and cash flow management by reducing capital locked in non-moving stock."
+    ))
 
     # Sales Forecasting
     sf = ml_tuple.get("Sales Forecasting", {})
@@ -166,10 +169,12 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.cell(0, 10, "What does the above mean?", ln=True)
         pdf.set_text_color(130, 130, 130)
         pdf.multi_cell(0, 8, (
-            "This section predicts future sales:\n"
-            "- Forecasts based on historical trends.\n"
-            "- Guides inventory and campaign planning.\n"
-            "- Prevents stockouts and overstocking."))
+            "This section provides a forward-looking estimate of future sales based on historical transaction patterns. It applies time-series modeling to uncover underlying trends and seasonality in past sales performance:\n\n"
+            "- Projects upcoming sales by analyzing historical growth, declines, and cyclical behavior.\n"
+            "- Supports inventory, workforce, and marketing planning by identifying periods of expected demand fluctuation.\n"
+            "- Minimizes the likelihood of stockouts or overstock by aligning operational decisions with predicted sales volume.\n\n"
+            "The forecasted figures offer a data-driven outlook derived from past business behavior, allowing for more informed and proactive decision-making."
+        ))
 
     # Customer Segmentation
     seg = ml_tuple.get("Customer Segmentation", {})
@@ -199,10 +204,13 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.cell(0, 10, "What does the above mean?", ln=True)
         pdf.set_text_color(130, 130, 130)
         pdf.multi_cell(0, 8, (
-            "This section groups customers by behavior:\n"
-            "- Uses clustering (e.g., K-Means).\n"
-            "- Identifies loyal vs. one-time buyers.\n"
-            "- Enables targeted marketing and offers."))
+            "This section categorizes customers into distinct segments based on purchasing behavior. The segmentation is designed to uncover behavioral patterns and support targeted strategies:\n\n"
+            "- Grouping is performed using key variables: Recency (how recently a customer made a purchase), Frequency (how often purchases occur), and Monetary value (total spending).\n"
+            "- Clustering techniques identify customers with similar RFM profiles and assign them to the same segment.\n"
+            "- Segments may represent, for example, high-frequency and high-value buyers, recent one-time purchasers, or long-inactive customers.\n"
+            "- Each segment reflects a behavioral identity that can guide differentiated marketing, engagement, and retention approaches.\n\n"
+            "The summary table shows average recency, frequency, and monetary values for each cluster. These values can be interpreted directly to understand the characteristics and potential of each customer segment."
+        ))
 
     # CLV
     clv = ml_tuple.get("Customer Lifetime Value", {})
@@ -229,10 +237,12 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.cell(0, 10, "What does the above mean?", ln=True)
         pdf.set_text_color(130, 130, 130)
         pdf.multi_cell(0, 8, (
-            "This section estimates customer value:\n"
-            "- CLV = Predicted total revenue per customer.\n"
-            "- Prioritizes high-value customers.\n"
-            "- Helps budget acquisition and retention."))
+            "This section estimates the Customer Lifetime Value (CLV), representing the total expected revenue from a customer throughout the duration of their relationship with the business:\n\n"
+            "- CLV is derived from historical purchasing patterns, including purchase frequency, average spend, and projected retention period.\n"
+            "- Higher CLV values indicate customers with greater long-term financial contribution.\n"
+            "- This insight enables strategic allocation of resources toward acquiring, nurturing, and retaining the most valuable customers.\n\n"
+            "The accompanying summary table displays predicted CLV per customer, providing a quantitative basis for prioritizing marketing, loyalty, and service initiatives."
+        ))
 
     # Final cleanup
     add_horizontal_line(pdf, thickness=0.9)
