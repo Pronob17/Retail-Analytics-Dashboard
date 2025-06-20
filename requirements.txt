@@ -8,6 +8,5 @@ seaborn
 openpyxl
 kneed
 fpdf
-kaleido
 Pillow
 
