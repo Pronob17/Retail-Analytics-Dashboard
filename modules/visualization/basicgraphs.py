@@ -3,6 +3,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from tests.errorlog import log_error
 
+# use ggplot style
+plt.style.use('ggplot')
+
 class BasicGraphsClass:
     def __init__(self, basic_analytics_df, selection):
         self.selection = selection

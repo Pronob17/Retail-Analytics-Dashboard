@@ -17,6 +17,9 @@ import streamlit as st
 
 from tests.errorlog import log_error
 
+# use ggplot style
+plt.style.use('ggplot')
+
 
 
 # function for storing the caches

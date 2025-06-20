@@ -4,6 +4,9 @@ import pandas as pd
 import datetime as dt
 import matplotlib.pyplot as plt
 
+# use ggplot style
+plt.style.use('ggplot')
+
 def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf = FPDF()
     pdf.set_margins(left=10, top=20, right=10)

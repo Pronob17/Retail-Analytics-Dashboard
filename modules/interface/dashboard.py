@@ -3,8 +3,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 from tests.errorlog import log_error
 
