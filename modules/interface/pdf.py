@@ -88,7 +88,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.ln(10)
     pdf.set_font("Arial", "", 12)
     pdf.set_text_color(90, 90, 90)
-    pdf.cell(0, 10, "What does the above mean?", ln=True)
+    pdf.cell(0, 10, "How to interpret the above result?", ln=True)
     pdf.set_text_color(130, 130, 130)
     pdf.multi_cell(0, 8, (
         "This section presents six key performance indicators (KPIs) based on the selected date range. Each metric is designed to summarize a specific aspect of business activity and can be interpreted in relation to the reported values:\n\n"
@@ -118,7 +118,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.ln(10)
     pdf.set_font("Arial", "", 12)
     pdf.set_text_color(90, 90, 90)
-    pdf.cell(0, 10, "What does the above mean?", ln=True)
+    pdf.cell(0, 10, "How to interpret the above result?", ln=True)
     pdf.set_text_color(130, 130, 130)
     pdf.multi_cell(0, 8, (
         "This section visualizes key patterns and trends derived from the selected data range. These charts provide context for evaluating performance dynamics, product demand, and profitability distribution:\n\n"
@@ -141,7 +141,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.ln(10)
     pdf.set_font("Arial", "", 12)
     pdf.set_text_color(90, 90, 90)
-    pdf.cell(0, 10, "What does the above mean?", ln=True)
+    pdf.cell(0, 10, "How to interpret the above result?", ln=True)
     pdf.set_text_color(130, 130, 130)
     pdf.multi_cell(0, 8, (
         "This table provides an overview of inventory aging, showing how long different products have remained in stock without being sold. The information supports stock management and operational efficiency:\n\n"
@@ -173,7 +173,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.ln(10)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(90, 90, 90)
-        pdf.cell(0, 10, "What does the above mean?", ln=True)
+        pdf.cell(0, 10, "How to interpret the above result?", ln=True)
         pdf.set_text_color(130, 130, 130)
         pdf.multi_cell(0, 8, (
             "This section provides a forward-looking estimate of future sales based on historical transaction patterns. It applies time-series modeling to uncover underlying trends and seasonality in past sales performance:\n\n"
@@ -209,7 +209,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.ln(10)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(90, 90, 90)
-        pdf.cell(0, 10, "What does the above mean?", ln=True)
+        pdf.cell(0, 10, "How to interpret the above result?", ln=True)
         pdf.set_text_color(130, 130, 130)
         pdf.multi_cell(0, 8, (
             "This section categorizes customers into distinct segments based on purchasing behavior. The segmentation is designed to uncover behavioral patterns and support targeted strategies:\n\n"
@@ -243,7 +243,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.ln(10)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(90, 90, 90)
-        pdf.cell(0, 10, "What does the above mean?", ln=True)
+        pdf.cell(0, 10, "How to interpret the above result?", ln=True)
         pdf.set_text_color(130, 130, 130)
         pdf.multi_cell(0, 8, (
             "This section estimates the Customer Lifetime Value (CLV), representing the total expected revenue from a customer throughout the duration of their relationship with the business:\n\n"
