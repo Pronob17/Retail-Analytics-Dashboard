@@ -137,7 +137,7 @@ class MachineLearningClass:
             'Train R2 Score': round(train_score, 4),
             'Test R2 Score': round(test_score, 4),
             'Sales Forecast Dataframe': sales_forecast_df,
-            'Reliability Percentage': round(((train_score + test_score) / 2), 2) * 100,
+            'Reliability Percentage': f"{round(((train_score + test_score) / 2), 2) * 100}%",
             'Next Day': next_day,
             'Next Day Predictions': next_day_prediction,
             'Line Chart Figure': fig  # You can save this or render it in Streamlit using st.pyplot(fig)
