@@ -60,11 +60,11 @@ class DashboardClass:
         :return: selection, upload_file
         """
         with st.container():
-            options = ['Demo Data', 'Upload Data']
+            options = ['Demo Data', 'Upload CSV file']
             selection = st.sidebar.selectbox(label="SELECT THE DATA", options=options)
 
             # if selection is upload data
-            if selection == 'Upload Data':
+            if selection == 'Upload CSV file':
                 upload_file = st.sidebar.file_uploader("Select file")
                 # check if uploaded file exist
                 if upload_file:
@@ -222,7 +222,7 @@ class DashboardClass:
             ml1.success(
                 f"Next day's ({sales_forecast_dict['Next Day']}) Final Amount Forecast: **{sales_forecast_dict['Next Day Predictions']:.2f}**")
             ml1.pyplot(sales_forecast_dict['Line Chart Figure'], use_container_width=True)
-            ml1.info(f"Model Reliability Percentage: **{sales_forecast_dict['Reliability Percentage']}%**")
+            ml1.info(f"Model Reliability Percentage: **{sales_forecast_dict['Reliability Percentage']}**")
 
             # additional verification details
             with ml1.expander("Technical Details of Model's Reliability"):
