@@ -29,7 +29,7 @@ def main():
     # call upload display and load file
     selection, uploaded_file = dashboard.upload_func()
 
-    if selection == 'Upload Data' and uploaded_file:
+    if selection == 'Upload CSV file' and uploaded_file:
         uploaded_df = load.loader_func(uploaded_file)
         main_df, validity = load.standardize_func(uploaded_df)
 

@@ -97,12 +97,21 @@ class CleanerClass:
 
         # get numeric column that have small unique values so will be converted to categorical
         numeric_but_cat = [col for col in num_col if cleaned_df[col].nunique() < 10]
-        
-        # extend the list
+
+        '''# datatype conversion to numerical if possible
+        for col in cat_col[:]:  # Use slice to safely modify list during iteration
+            converted_col = pd.to_numeric(cleaned_df[col], errors='coerce')
+
+            if converted_col.notna().sum() > 0:
+                cleaned_df[col] = converted_col
+                num_col.append(col)
+                cat_col.remove(col)  # also remove from cat_col since now it's numeric'''
+
+        '''# extend the categorical list
         for col in numeric_but_cat:
             cleaned_df[col] = cleaned_df[col].astype('object')
             cat_col.append(col)
-            num_col.remove(col)
+            num_col.remove(col)'''
 
         # STARTING THE IMPUTATION
         # numerical transformation

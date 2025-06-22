@@ -1,0 +1,8 @@
+[2025-06-22 19:07:24] kpi_calculation_func in basicanalytics.py: 'FinalAmount'
+[2025-06-22 19:07:24] some_function in basicanalytics.py: 'CustomerID'
+[2025-06-22 19:07:24] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-06-22 19:07:24] kpi_calculation_func in basicanalytics.py: 'FinalAmount'
+[2025-06-22 19:07:24] kpi_calculation_func in basicanalytics.py: 'CustomerID'
+[2025-06-22 19:07:24] ml_sales_forecasting_func in machinelearningoperations.py: "['FinalAmount'] not found in axis"
+[2025-06-22 19:07:24] customer_segmentation_func (Seaborn Version): 'UnitPrice'
+[2025-06-22 19:07:24] ml_customer_lifetime_value_func: Missing required columns: ['CustomerID', 'TransactionID', 'UnitPrice', 'DiscountPercent']
