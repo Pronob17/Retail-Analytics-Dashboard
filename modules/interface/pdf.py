@@ -159,6 +159,15 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Sales Forecasting Summary", ln=True, align='C')
         add_horizontal_line(pdf)
+        pdf.ln(10)
+        # explaining reliability
+        pdf.set_font("Arial", "", 12)
+        # Light gray text color (RGB)
+        pdf.set_text_color(150, 150, 150)
+        # One-line explanation (no score)
+        pdf.cell(0, 10,
+                 "(NOTE: Model Reliability shows how consistently a model gives accurate results.)",
+                 ln=True)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(64, 64, 64)
         pdf.cell(0, 8, f"Model Reliability: {sf.get('Reliability Percentage', 'N/A')}", ln=True)
@@ -192,6 +201,15 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Customer Segmentation Summary", ln=True, align='C')
         add_horizontal_line(pdf)
+        pdf.ln(10)
+        # explaining reliability
+        pdf.set_font("Arial", "", 12)
+        # Light gray text color (RGB)
+        pdf.set_text_color(150, 150, 150)
+        # One-line explanation (no score)
+        pdf.cell(0, 10,
+                 "(NOTE: Model Reliability shows how consistently a model gives accurate results.)",
+                 ln=True)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(64, 64, 64)
         pdf.cell(0, 8, f"Model Reliability: {seg.get('Reliability Percentage', 'N/A')}", ln=True)
@@ -229,6 +247,15 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Customer Lifetime Value (CLV)", ln=True, align='C')
         add_horizontal_line(pdf)
+        pdf.ln(10)
+        # explaining reliability
+        pdf.set_font("Arial", "", 12)
+        # Light gray text color (RGB)
+        pdf.set_text_color(150, 150, 150)
+        # One-line explanation (no score)
+        pdf.cell(0, 10,
+                 "(NOTE: Model Reliability shows how consistently a model gives accurate results.)",
+                 ln=True)
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(64, 64, 64)
         pdf.cell(0, 8, f"Model Reliability: {clv.get('Reliability', 'N/A')}", ln=True)

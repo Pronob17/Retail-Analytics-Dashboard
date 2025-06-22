@@ -7,6 +7,7 @@ from sklearn.impute import SimpleImputer
 
 from tests.errorlog import log_error
 
+
 @st.cache_data()
 def datetime_cleaner_func(main_df):
     # create clean instance
@@ -14,10 +15,9 @@ def datetime_cleaner_func(main_df):
 
     # pass the dataframe clean datetime of the dataframe (cleaned_date_main_df will be used in ml too)
     cleaned_date_main_df, datetime_list = clean_date.datetime_func(main_df)
-    print(cleaned_date_main_df.columns)
-
 
     return cleaned_date_main_df, datetime_list
+
 
 @st.cache_data()
 def complete_cleaner_func(cleaned_date_main_df, datetime_list):
@@ -26,7 +26,6 @@ def complete_cleaner_func(cleaned_date_main_df, datetime_list):
 
     # imputing the values for basic analytics
     basic_analytics_df = complete_clean.imputer_func(cleaned_date_main_df, datetime_list)
-    print(basic_analytics_df.columns)
 
     return basic_analytics_df
 
@@ -34,7 +33,8 @@ def complete_cleaner_func(cleaned_date_main_df, datetime_list):
 class CleanerClass:
     def __init__(self):
         # GET datetime columns
-        pass
+        self.num_col = []
+        self.cat_col = []
 
     def datetime_func(self, main_df):
         """
@@ -72,13 +72,38 @@ class CleanerClass:
         for dt in datetime_list:
             cleaned_date_main_df[dt] = pd.to_datetime(cleaned_date_main_df[dt], errors='coerce', infer_datetime_format=True)
 
+        # SORT OUT THE DATATYPES FOR NUMERICAL AND CATEGORICAL
+            # get id column
+            id_col = [col for col in cleaned_date_main_df.columns if "ID" in col]
+
+            # filter out the id column
+            except_id_col = [col for col in cleaned_date_main_df.columns if 'ID' not in col]
+
+            # filter out the date column
+            num_cat_col = [col for col in except_id_col if col not in datetime_list]
+
+            # convert the convertable numerical column
+            for col in num_cat_col:
+                converted = pd.to_numeric(cleaned_date_main_df[col], errors='coerce')
+
+                # numerical ration
+                numeric_ratio = converted.notna().sum() / len(cleaned_date_main_df)
+
+                # check 50% threshold and then convert to numeric if greater than that
+                if numeric_ratio > 0.5:
+                    cleaned_date_main_df[col] = converted
+                    self.num_col.append(col)
+                else:
+                    self.cat_col.append(col)
+
         return cleaned_date_main_df, datetime_list
 
     def imputer_func(self, cleaned_date_main_df, datetime_list):
         """
         Imputes median and mode for numerical and categorical columns
         :param cleaned_date_main_df:
-        :return: imputed cleaned_date_main_df
+        :param datetime_list:
+        :return: basic_analytics_df
         """
         # create the copy of the dataframe that have cleaned datetime columns
         cleaned_df = cleaned_date_main_df.copy()
@@ -135,7 +160,6 @@ class CleanerClass:
         # add the id columns
         processed_final_df = pd.concat([cleaned_df[id_col].reset_index(drop=True), processed_df], axis=1)
         basic_analytics_df = pd.concat([processed_final_df, cleaned_df[datetime_list].reset_index(drop=True)], axis=1)
-        print("Datetime columns being restored:", datetime_list)
 
         return basic_analytics_df
 
