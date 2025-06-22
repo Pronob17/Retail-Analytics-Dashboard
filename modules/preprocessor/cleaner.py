@@ -87,40 +87,27 @@ class CleanerClass:
         id_col = [col for col in cleaned_df.columns if "ID" in col]
 
         # filter out the id column
-        num_cat_col = [col for col in cleaned_df.columns if 'ID' not in col]
+        except_id_col = [col for col in cleaned_df.columns if 'ID' not in col]
 
-        # get numerical columns
-        num_col = cleaned_df[num_cat_col].select_dtypes(include=['number']).columns.tolist()
+        # filter out the date column
+        num_cat_col = [col for col in except_id_col if col not in datetime_list]
 
-        # categorical column
-        cat_col = cleaned_df[num_cat_col].select_dtypes(include=['object', 'category']).columns.tolist()
+        # convert the convertable numerical column
+        num_col = []
+        cat_col = []
+        for col in num_cat_col:
+            converted = pd.to_numeric(cleaned_df[col], errors='coerce')
 
-        # get numeric column that have small unique values so will be converted to categorical
-        numeric_but_cat = [col for col in num_col if cleaned_df[col].nunique() < 10]
+            # numerical ration
+            numeric_ratio = converted.notna().sum() / len(cleaned_df)
 
-        # extending numerical column
-        safe_num_col = []
+            # check 50% threshold and then convert to numeric if greater than that
+            if numeric_ratio > 0.5:
+                cleaned_df[col] = converted
+                num_col.append(col)
+            else:
+                cat_col.append(col)
 
-        for col in cat_col:
-            converted_col = pd.to_numeric(cleaned_df[col], errors='coerce')
-
-            # If more than 80% of values are numeric after coercion
-            non_na_ratio = converted_col.notna().mean()
-
-            if non_na_ratio >= 0.8:
-                cleaned_df[col] = converted_col
-                safe_num_col.append(col)
-
-        # Update your column lists AFTER the loop
-        num_col.extend(safe_num_col)
-        cat_col = [col for col in cat_col if col not in safe_num_col]
-
-
-        '''# extend the categorical list
-        for col in numeric_but_cat:
-            cleaned_df[col] = cleaned_df[col].astype('object')
-            cat_col.append(col)
-            num_col.remove(col)'''
 
         # STARTING THE IMPUTATION
         # numerical transformation
