@@ -98,14 +98,23 @@ class CleanerClass:
         # get numeric column that have small unique values so will be converted to categorical
         numeric_but_cat = [col for col in num_col if cleaned_df[col].nunique() < 10]
 
-        '''# datatype conversion to numerical if possible
-        for col in cat_col[:]:  # Use slice to safely modify list during iteration
+        # extending numerical column
+        safe_num_col = []
+
+        for col in cat_col:
             converted_col = pd.to_numeric(cleaned_df[col], errors='coerce')
 
-            if converted_col.notna().sum() > 0:
+            # If more than 80% of values are numeric after coercion
+            non_na_ratio = converted_col.notna().mean()
+
+            if non_na_ratio >= 0.8:
                 cleaned_df[col] = converted_col
-                num_col.append(col)
-                cat_col.remove(col)  # also remove from cat_col since now it's numeric'''
+                safe_num_col.append(col)
+
+        # Update your column lists AFTER the loop
+        num_col.extend(safe_num_col)
+        cat_col = [col for col in cat_col if col not in safe_num_col]
+
 
         '''# extend the categorical list
         for col in numeric_but_cat:
