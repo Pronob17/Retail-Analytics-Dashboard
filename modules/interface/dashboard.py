@@ -282,6 +282,7 @@ class DashboardClass:
                 file_name="Retail_Summary_Result.pdf",
                 mime="application/pdf"
             )
+            st.sidebar.warning("NOTE: The summary reflects only the filters applied in the dashboard.")
 
             # create a divider
             st.sidebar.divider()

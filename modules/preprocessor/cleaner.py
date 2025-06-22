@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -6,11 +7,34 @@ from sklearn.impute import SimpleImputer
 
 from tests.errorlog import log_error
 
+@st.cache_data()
+def datetime_cleaner_func(main_df):
+    # create clean instance
+    clean_date = CleanerClass()
+
+    # pass the dataframe clean datetime of the dataframe (cleaned_date_main_df will be used in ml too)
+    cleaned_date_main_df, datetime_list = clean_date.datetime_func(main_df)
+    print(cleaned_date_main_df.columns)
+
+
+    return cleaned_date_main_df, datetime_list
+
+@st.cache_data()
+def complete_cleaner_func(cleaned_date_main_df, datetime_list):
+    # create clean instance
+    complete_clean = CleanerClass()
+
+    # imputing the values for basic analytics
+    basic_analytics_df = complete_clean.imputer_func(cleaned_date_main_df, datetime_list)
+    print(basic_analytics_df.columns)
+
+    return basic_analytics_df
+
 
 class CleanerClass:
     def __init__(self):
         # GET datetime columns
-        self.datetime_list = []
+        pass
 
     def datetime_func(self, main_df):
         """
@@ -18,6 +42,7 @@ class CleanerClass:
         :param main_df:
         :return: cleaned_date_df
         """
+        datetime_list = []
         # create a copy of the original dataframe
         cleaned_date_main_df = main_df.copy()
 
@@ -41,15 +66,15 @@ class CleanerClass:
                         continue
 
                 if count / sample_size >= 0.8:
-                    self.datetime_list.append(col)
+                    datetime_list.append(col)
 
         # convert datetime_list to datetime
-        for dt in self.datetime_list:
+        for dt in datetime_list:
             cleaned_date_main_df[dt] = pd.to_datetime(cleaned_date_main_df[dt], errors='coerce', infer_datetime_format=True)
 
-        return cleaned_date_main_df
+        return cleaned_date_main_df, datetime_list
 
-    def imputer_func(self, cleaned_date_main_df):
+    def imputer_func(self, cleaned_date_main_df, datetime_list):
         """
         Imputes median and mode for numerical and categorical columns
         :param cleaned_date_main_df:
@@ -104,7 +129,8 @@ class CleanerClass:
 
         # add the id columns
         processed_final_df = pd.concat([cleaned_df[id_col].reset_index(drop=True), processed_df], axis=1)
-        basic_analytics_df = pd.concat([processed_final_df, cleaned_df[self.datetime_list].reset_index(drop=True)], axis=1)
+        basic_analytics_df = pd.concat([processed_final_df, cleaned_df[datetime_list].reset_index(drop=True)], axis=1)
+        print("Datetime columns being restored:", datetime_list)
 
         return basic_analytics_df
 

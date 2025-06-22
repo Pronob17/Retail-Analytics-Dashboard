@@ -236,6 +236,8 @@ class MachineLearningClass:
             summary_df = rfm.groupby('Segment')[['Recency', 'Frequency', 'Monetary']].mean()
             summary_df['Number of Customers'] = rfm['Segment'].value_counts().sort_index()
             summary_df = summary_df.reset_index()
+            # Round all numeric values to 2 decimal places
+            summary_df = summary_df.round(2)
 
             # Reliability Score
             dbi_score = davies_bouldin_score(scaled_X, rfm['Segment'])
@@ -375,7 +377,7 @@ class MachineLearningClass:
             clv_dict['fig_hist'] = fig
 
             clv_dict['Sample Results'] = customer_df[['CustomerID', 'CLV_Predicted']].sort_values(
-                by='CLV_Predicted', ascending=False).head(10)
+                by='CLV_Predicted', ascending=False).head(10).round(2)
 
         except Exception as e:
             import traceback

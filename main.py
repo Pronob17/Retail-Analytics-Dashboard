@@ -4,7 +4,7 @@ import streamlit as st
 from modules.analytics.basicanalytics import BasicAnalyticsClass
 from modules.interface.dashboard import DashboardClass
 from modules.machinelearning.machinelearningoperations import cache_func
-from modules.preprocessor.cleaner import CleanerClass
+from modules.preprocessor.cleaner import datetime_cleaner_func, complete_cleaner_func
 from modules.preprocessor.loader import LoaderClass
 from modules.visualization.basicgraphs import BasicGraphsClass
 from modules.interface.pdf import pdf_generator_func
@@ -39,15 +39,14 @@ def main():
     elif selection == 'Demo Data' and uploaded_file is None:
         main_df = load.demo_func()
 
-    # create clean instance
-    clean = CleanerClass()
+    # CLEANING PROCESS
+    # call the datetime cleaner function
+    with st.spinner('Cleanly formatting the dates...'):
+        cleaned_date_main_df, datetime_list = datetime_cleaner_func(main_df)
 
-    # pass the dataframe clean datetime of the dataframe (cleaned_date_main_df will be used in ml too)
-    cleaned_date_main_df = clean.datetime_func(main_df)
-
-    # impute the dataframe
-    basic_analytics_df = clean.imputer_func(cleaned_date_main_df)
-
+    # call the complete cleaner function
+    with st.spinner('Processing data for KPI analytics...'):
+        basic_analytics_df = complete_cleaner_func(cleaned_date_main_df, datetime_list)
 
     # KEY PERFORMANCE INDICATORS
 

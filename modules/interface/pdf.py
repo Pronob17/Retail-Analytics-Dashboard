@@ -68,7 +68,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     add_horizontal_line(pdf, thickness=0.9)
     pdf.set_text_color(64, 64, 64)
     pdf.set_font("Arial", "B", 12)
-    pdf.cell(0, 10, f"Downloaded on: {dt.datetime.now()}", ln=True, align='R')
+    pdf.cell(0, 10, f"Downloaded on: {dt.datetime.now().date()}", ln=True, align='R')
     pdf.ln(10)
 
     # KPIs
