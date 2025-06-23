@@ -20,6 +20,7 @@ class LoaderClass:
         Merges the demo files and converts them to dataframe.
         :return: demo_df
         """
+        base_name = 'demo_file'
         # get the demo data from the folder
         path = "./data/"
         cust_file = os.path.join(path, "customer_data.csv")
@@ -34,7 +35,7 @@ class LoaderClass:
         prod_tran_df = pd.merge(prod_df, tran_df, on="ProductID")
         demo_df = pd.merge(cust_df, prod_tran_df, on="CustomerID")
 
-        return demo_df
+        return demo_df, base_name
 
     def loader_func(self, main_file):
         """

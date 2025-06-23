@@ -37,7 +37,7 @@ def main():
         dashboard.sidebar_func(validity_df)
 
     elif selection == 'Demo Data' and uploaded_file is None:
-        main_df = load.demo_func()
+        main_df, base_name = load.demo_func()
 
     # CLEANING PROCESS
     # call the datetime cleaner function
