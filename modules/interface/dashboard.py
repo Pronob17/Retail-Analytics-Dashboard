@@ -1,12 +1,11 @@
 import streamlit as st
+
 # wide layout display
 st.set_page_config(layout="wide")
 
 import pandas as pd
 
-
 from tests.errorlog import log_error
-
 
 
 
@@ -68,7 +67,6 @@ class DashboardClass:
                 upload_file = st.sidebar.file_uploader("Select file")
                 # check if uploaded file exist
                 if upload_file:
-                    st.sidebar.success("File Uploaded Successfully!!")
                     return selection, upload_file
                 # if it doesnt stop the streamlit display
                 else:

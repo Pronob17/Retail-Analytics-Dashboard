@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 # use ggplot style
 plt.style.use('ggplot')
 
-def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
+def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple,base_name):
     pdf = FPDF()
     pdf.set_margins(left=10, top=20, right=10)
     pdf.add_page()
     image_paths = []
+
 
     def add_horizontal_line(pdf_obj, thickness=0.5):
         pdf_obj.set_line_width(thickness)
@@ -66,9 +67,11 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf.set_text_color(255, 165, 0)
     pdf.cell(0, 10, "RETAIL ANALYTICS REPORT", ln=True, align='C')
     add_horizontal_line(pdf, thickness=0.9)
-    pdf.set_text_color(64, 64, 64)
-    pdf.set_font("Arial", "B", 12)
-    pdf.cell(0, 10, f"Downloaded on: {dt.datetime.now().date()}", ln=True, align='R')
+
+    pdf.set_font("Arial", "", 12)
+    pdf.set_text_color(106, 90, 205)
+    pdf.cell(0, 10, f"FILE NAME: {base_name}", ln=True, align='R')
+    pdf.cell(0, 10, f"DOWNLOADED ON: {dt.datetime.now().date()}", ln=True, align='R')
     pdf.ln(10)
 
     # KPIs

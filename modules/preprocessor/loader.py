@@ -1,5 +1,6 @@
 import os
 import json
+import streamlit as st
 
 import pandas as pd
 
@@ -41,10 +42,23 @@ class LoaderClass:
         :param main_file:
         :return:
         """
+        # get file name
+        full_name = main_file.name
 
-        main_df = pd.read_csv(main_file)
+        # extract name without extension
+        base_name = os.path.splitext(full_name)[0]
 
-        return main_df
+        try:
+            main_df = pd.read_csv(main_file)
+            st.sidebar.success('File uploaded successfully!!!')
+
+        except Exception as e:
+            print(e)
+            validity_check = 'Invalid'
+            st.sidebar.error("Invalid file type. It should be of a CSV file (.csv file extension)")
+            st.stop()
+
+        return main_df, base_name
 
     def standardize_func(self, df):
         """

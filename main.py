@@ -30,11 +30,11 @@ def main():
     selection, uploaded_file = dashboard.upload_func()
 
     if selection == 'Upload CSV file' and uploaded_file:
-        uploaded_df = load.loader_func(uploaded_file)
-        main_df, validity = load.standardize_func(uploaded_df)
+        uploaded_df, base_name = load.loader_func(uploaded_file)
+        main_df, validity_df = load.standardize_func(uploaded_df)
 
         # send the result to show column details
-        dashboard.sidebar_func(validity)
+        dashboard.sidebar_func(validity_df)
 
     elif selection == 'Demo Data' and uploaded_file is None:
         main_df = load.demo_func()
@@ -142,7 +142,7 @@ def main():
 
     # 5. Generate PDF Summary
     with st.spinner("Now Generating Summary Report..."):
-        summary_result = pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple)
+        summary_result = pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name)
 
     # 6. Download Trigger via Dashboard
     dashboard.pdf_download_func(summary_result)
