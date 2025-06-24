@@ -96,6 +96,10 @@ class CleanerClass:
                 else:
                     self.cat_col.append(col)
 
+        # Ensure key columns have correct types
+        cleaned_date_main_df["TransactionID"] = cleaned_date_main_df["TransactionID"].astype(str)
+        cleaned_date_main_df["CustomerID"] = cleaned_date_main_df["CustomerID"].astype(str)
+
         return cleaned_date_main_df, datetime_list
 
     def imputer_func(self, cleaned_date_main_df, datetime_list):
@@ -133,7 +137,6 @@ class CleanerClass:
             else:
                 cat_col.append(col)
 
-
         # STARTING THE IMPUTATION
         # numerical transformation
         numerical_transformer = Pipeline(steps=[
@@ -152,7 +155,7 @@ class CleanerClass:
         ])
 
         # fit and transform the data
-        processed_array = preprocessor.fit_transform(cleaned_date_main_df)
+        processed_array = preprocessor.fit_transform(cleaned_df)
 
         # convert to dataframe
         processed_df = pd.DataFrame(processed_array, columns=num_col + cat_col)
@@ -160,6 +163,10 @@ class CleanerClass:
         # add the id columns
         processed_final_df = pd.concat([cleaned_df[id_col].reset_index(drop=True), processed_df], axis=1)
         basic_analytics_df = pd.concat([processed_final_df, cleaned_df[datetime_list].reset_index(drop=True)], axis=1)
+
+        # Ensure key columns have correct types
+        cleaned_df["TransactionID"] = cleaned_df["TransactionID"].astype(str)
+        cleaned_df["CustomerID"] = cleaned_df["CustomerID"].astype(str)
 
         return basic_analytics_df
 

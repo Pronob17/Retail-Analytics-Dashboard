@@ -24,7 +24,10 @@ class BasicAnalyticsClass:
         mask = ((main_df["Date"] >= start_date_pd) & (main_df["Date"] <= end_date_pd))
 
         # create the filtered dataframe
-        filtered_df = main_df[mask]
+        filtered_df = main_df[mask].copy()
+
+        if filtered_df.empty or filtered_df['CustomerID'].nunique() == 0 or filtered_df['TransactionID'].nunique() == 0:
+            return "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"
 
         # total_sales
         # 'FinalAmount', 'SellingPrice', 'Discount', 'Quantity'

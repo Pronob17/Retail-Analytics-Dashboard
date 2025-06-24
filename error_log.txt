@@ -1,0 +1,14 @@
+[2025-06-24 11:22:16] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-06-24 11:22:16] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-06-24 11:22:17] customer_segmentation_func (Seaborn Version): "Column(s) ['TransactionID'] do not exist"
+[2025-06-24 11:22:17] ml_customer_lifetime_value_func: Missing required columns: ['TransactionID', 'UnitPrice']
+[2025-06-24 11:22:22] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-06-24 11:22:22] kpi_calculation_func in basicanalytics.py: 'TransactionID'
+[2025-06-24 11:30:10] ml_sales_forecasting_func in machinelearningoperations.py: Input y contains NaN.
+[2025-06-24 11:30:10] customer_segmentation_func (Seaborn Version): Input X contains NaN.
+KMeans does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+[2025-06-24 11:30:10] ml_customer_lifetime_value_func: Missing required columns: ['UnitPrice']
+[2025-06-24 11:30:37] ml_customer_lifetime_value_func: Missing required columns: ['UnitPrice']
+[2025-06-24 12:03:18] customer_segmentation_func (Seaborn Version): Input X contains NaN.
+KMeans does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+[2025-06-24 12:03:18] ml_customer_lifetime_value_func: Missing required columns: ['UnitPrice']

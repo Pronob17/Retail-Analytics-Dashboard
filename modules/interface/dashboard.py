@@ -34,14 +34,17 @@ class DashboardClass:
         # Minimum required columns with unambiguous descriptions
         with st.container():
             dashboard_key_descriptions = {
-                "CustomerID": "Unique ID for each customer, used to track repeat behavior.",
-                "Date": "Date of the transaction (format: YYYY-MM-DD).",
-                "FinalAmount": "Total amount paid by the customer after discounts and taxes.",
-                "SellingPrice": "Per-unit selling price before discounts.",
-                "CostPrice": "Per-unit cost to the business for calculating profit.",
+                "CustomerID": "Unique ID given to each customer to track their purchases.",
+                "CustomerName": "Full name of the customer (optional, used for display).",
+                "Date": "The date the purchase was made (format: YYYY-MM-DD).",
+                "FinalAmount": "Total amount paid after all discounts and taxes.",
+                "SellingPrice": "Price of one unit before any discount.",
+                "CostPrice": "Cost of one unit to the business (used to calculate profit).",
                 "ProductName": "Name or description of the product sold.",
-                "Quantity": "Number of product units sold in the transaction.",
-                "Category": "Product category (e.g., Electronics, Apparel)."
+                "Quantity": "Number of units sold in the transaction.",
+                "Category": "Product type or category (e.g., Electronics, Clothing).",
+                "TransactionID": "Unique ID for the sale, used to identify each transaction.",
+                "DiscountPercent": "Percentage of discount applied before tax."
             }
 
             # Create DataFrame
@@ -134,6 +137,10 @@ class DashboardClass:
             col21.metric("TOTAL CUSTOMERS", total_customers)
             col22.metric("CUSTOMER FREQUENCY", customer_frequency)
             col23.metric("AVERAGE ORDER VALUE", average_order_value)
+
+            for val in [total_sales, gross_profit_margin, avg_days_between_purchases,
+                        total_customers, customer_frequency, average_order_value]:
+                print(f"KPI Value: {val} | Type: {type(val)}")
 
             # create an info expander
             with st.expander("EXPAND FOR INFORMATION ON **KEY PERFORMANCE INDICATORS**"):
