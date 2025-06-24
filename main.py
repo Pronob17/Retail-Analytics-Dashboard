@@ -145,7 +145,7 @@ def main():
         summary_result = pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name)
 
     # 6. Download Trigger via Dashboard
-    dashboard.pdf_download_func(summary_result)
+    dashboard.pdf_download_func(summary_result, base_name)
 
 
 if __name__ == "__main__":

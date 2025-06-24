@@ -270,7 +270,7 @@ class DashboardClass:
             # create divider
             st.divider()
 
-    def pdf_download_func(self, summary_result):
+    def pdf_download_func(self, summary_result, base_name):
         """
         This dashboard function gets the summary result from the main module and when the download button is clicked, it sends the summary_result.
         :param summary_result:
@@ -284,7 +284,7 @@ class DashboardClass:
             st.sidebar.download_button(
                 label="📄 DOWNLOAD SUMMARY",
                 data=summary_result,
-                file_name="Retail_Summary_Result.pdf",
+                file_name=f"Retail_Summary_Result_({base_name}).pdf",
                 mime="application/pdf"
             )
             st.sidebar.warning("NOTE: The summary reflects only the filters applied in the dashboard.")
