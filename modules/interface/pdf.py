@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
 
-def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
+def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     pdf = FPDF()
     pdf.set_margins(left=10, top=20, right=10)
     pdf.add_page()
@@ -63,24 +63,24 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
         image_paths.append(path)
 
     # Title
+    pdf.set_font("Arial", "", 8)
+    pdf.set_text_color(106, 90, 205)
+    pdf.cell(0, 10, f"DOWNLOADED ON: {dt.datetime.now().date()}", ln=True, align='R')
     add_horizontal_line(pdf, thickness=0.9)
     pdf.set_font("Arial", "B", 24)
     pdf.set_text_color(255, 165, 0)
     pdf.cell(0, 10, "RETAIL ANALYTICS REPORT", ln=True, align='C')
     add_horizontal_line(pdf, thickness=0.9)
-
-    pdf.set_font("Arial", "", 12)
-    pdf.set_text_color(106, 90, 205)
-    pdf.cell(0, 10, f"FILE NAME: {base_name}", ln=True, align='R')
-    pdf.cell(0, 10, f"DOWNLOADED ON: {dt.datetime.now().date()}", ln=True, align='R')
     pdf.ln(10)
+
+
 
     # KPIs
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 128)
-    add_horizontal_line(pdf)
+    add_horizontal_line(pdf, thickness=0.1)
     pdf.cell(0, 10, "Key Performance Indicators (KPIs)", ln=True, align='C')
-    add_horizontal_line(pdf)
+    add_horizontal_line(pdf, thickness=0.1)
     pdf.ln(5)
     pdf.set_text_color(64, 64, 64)
     pdf.set_font("Arial", "", 12)
@@ -108,9 +108,9 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 128)
-    add_horizontal_line(pdf)
+    add_horizontal_line(pdf, thickness=0.1)
     pdf.cell(0, 10, "Visual Insights", ln=True, align='C')
-    add_horizontal_line(pdf)
+    add_horizontal_line(pdf, thickness=0.1)
     pdf.ln(5)
     pdf.set_text_color(64, 64, 64)
     for idx, fig in enumerate(graph_tuple):
@@ -135,9 +135,9 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 128)
-    add_horizontal_line(pdf)
+    add_horizontal_line(pdf, thickness=0.1)
     pdf.cell(0, 10, "Inventory Aging Table", ln=True, align='C')
-    add_horizontal_line(pdf)
+    add_horizontal_line(pdf, thickness=0.1)
     pdf.set_text_color(64, 64, 64)
     if isinstance(inv_tuple, pd.DataFrame):
         add_dataframe_section(pdf, inv_tuple, "Inventory Aging (Top 10 Rows)")
@@ -158,11 +158,11 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
     sf = ml_tuple.get("Sales Forecasting", {})
     if sf:
         pdf.add_page()
-        add_horizontal_line(pdf)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.set_font("Arial", "B", 16)
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Sales Forecasting Summary", ln=True, align='C')
-        add_horizontal_line(pdf)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.ln(10)
         # explaining reliability
         pdf.set_font("Arial", "", 12)
@@ -200,11 +200,11 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
     seg = ml_tuple.get("Customer Segmentation", {})
     if seg:
         pdf.add_page()
-        add_horizontal_line(pdf)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.set_font("Arial", "B", 16)
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Customer Segmentation Summary", ln=True, align='C')
-        add_horizontal_line(pdf)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.ln(10)
         # explaining reliability
         pdf.set_font("Arial", "", 12)
@@ -246,11 +246,11 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name):
     clv = ml_tuple.get("Customer Lifetime Value", {})
     if clv:
         pdf.add_page()
-        add_horizontal_line(pdf)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.set_font("Arial", "B", 16)
         pdf.set_text_color(0, 0, 128)
         pdf.cell(0, 10, "Customer Lifetime Value (CLV)", ln=True, align='C')
-        add_horizontal_line(pdf)
+        add_horizontal_line(pdf, thickness=0.1)
         pdf.ln(10)
         # explaining reliability
         pdf.set_font("Arial", "", 12)

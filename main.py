@@ -142,7 +142,7 @@ def main():
 
     # 5. Generate PDF Summary
     with st.spinner("Now Generating Summary Report..."):
-        summary_result = pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple, base_name)
+        summary_result = pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple)
 
     # 6. Download Trigger via Dashboard
     dashboard.pdf_download_func(summary_result, base_name)
