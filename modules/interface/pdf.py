@@ -65,7 +65,7 @@ def pdf_generator_func(kpi_tuple, graph_tuple, inv_tuple, ml_tuple):
     # Title
     pdf.set_font("Arial", "", 8)
     pdf.set_text_color(106, 90, 205)
-    pdf.cell(0, 10, f"DOWNLOADED ON: {dt.datetime.now().date()}", ln=True, align='R')
+    pdf.cell(0, 10, f"DOWNLOADED ON: {dt.datetime.now().date():%d-%B-%Y}", ln=True, align='R')
     add_horizontal_line(pdf, thickness=0.9)
     pdf.set_font("Arial", "B", 24)
     pdf.set_text_color(255, 165, 0)
