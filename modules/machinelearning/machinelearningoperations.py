@@ -117,7 +117,7 @@ class MachineLearningClass:
 
             # next day forecast
             last_day = ml_linear_regression_df['Date'].max()
-            next_day = (last_day + pd.Timedelta(days=1)).date()
+            next_day = f'{(last_day + pd.Timedelta(days=1)).date():%d-%m-%Y}'
 
             # average features for prediction
             lifetime_avg_features = X.mean().values.reshape(1, -1)
@@ -130,7 +130,7 @@ class MachineLearningClass:
             fig, ax = plt.subplots()
             train_score = 0
             test_score = 0
-            next_day = 0
+            next_day = 'N/A'
             next_day_prediction = 0
 
         sales_forecast_dict = {
@@ -138,7 +138,7 @@ class MachineLearningClass:
             'Test R2 Score': round(test_score, 4),
             'Sales Forecast Dataframe': sales_forecast_df,
             'Reliability Percentage': f"{round(((train_score + test_score) / 2), 2) * 100}%",
-            'Next Day': f'{next_day:%d-%m-%Y}',
+            'Next Day': next_day,
             'Next Day Predictions': next_day_prediction,
             'Line Chart Figure': fig  # You can save this or render it in Streamlit using st.pyplot(fig)
         }
