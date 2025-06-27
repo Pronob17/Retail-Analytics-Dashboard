@@ -30,6 +30,16 @@ class DashboardClass:
             # divider
             st.divider()
 
+            # disclaimer
+            st.markdown("""📌 **Accessing the Sidebar**
+To interact with the filters and options, click the top-left menu icon (>) in the Streamlit app. This opens the sidebar, where you can upload data and adjust settings.
+
+⚠️ **Disclaimer**
+This is a general-purpose Retail Analytics Dashboard built for exploratory and indicative analysis.
+In cases where the input data is incomplete or inconsistent (e.g., missing values, wrong data types, or unexpected formats), the app uses basic fallback logic and approximations to still provide useful insights — rather than showing 'no results.'""")
+            # divider
+            st.divider()
+
         # create the necessary column
         # Minimum required columns with unambiguous descriptions
         with st.container():

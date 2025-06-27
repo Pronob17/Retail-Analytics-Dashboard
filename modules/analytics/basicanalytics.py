@@ -48,9 +48,10 @@ class BasicAnalyticsClass:
         # gross profit margin
         # 'FinalAmount', 'CostPrice', 'Quantity'
         try:
-            gross_profit = filtered_df['FinalAmount'].sum() - (
-                    filtered_df['Quantity'] * filtered_df['CostPrice']).sum()
-            gross_profit_margin = round(gross_profit / filtered_df['FinalAmount'].sum() * 100, 2)
+            revenue = filtered_df['FinalAmount'].sum()
+            cogs = (filtered_df['Quantity'] * filtered_df['CostPrice']).sum()
+            gross_profit = revenue - cogs
+            gross_profit_margin = round((gross_profit / revenue) * 100, 2) if revenue else 0
         except Exception as e:
             print(e)
             log_error(str(e), source="kpi_calculation_func in basicanalytics.py")
